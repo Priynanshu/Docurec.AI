@@ -1,11 +1,11 @@
 const multer = require('multer');
-const { AppError } = require('../utils/errors');
+const ApiError = require('../utils/ApiError');
 
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/jpg', 'image/png', 'image/tiff', 'image/webp',
   'application/pdf',
 ];
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = 10 * 1024 * 1024;
 
 const storage = multer.memoryStorage();
 
@@ -13,7 +13,7 @@ const fileFilter = (req, file, cb) => {
   if (ALLOWED_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new AppError(`File type '${file.mimetype}' not allowed. Use JPEG, PNG, TIFF, or PDF.`, 400, 'INVALID_FILE_TYPE'), false);
+    cb(new ApiError(400, `File type '${file.mimetype}' not allowed. Use JPEG, PNG, TIFF, or PDF.`), false);
   }
 };
 

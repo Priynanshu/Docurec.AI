@@ -9,7 +9,7 @@ const {
 const { authenticate } = require('../middleware/auth');
 const { chatLimiter } = require('../middleware/rateLimiter');
 
-// All chat routes require login
+
 router.use(authenticate);
 
 router.post('/sessions', createSession);

@@ -75,7 +75,7 @@ export default function Compare() {
         <p className="text-text-tertiary text-sm mt-0.5">Compare two document versions to see field-level changes</p>
       </div>
 
-      {/* Doc pickers */}
+      {}
       <div className="flex gap-4 items-stretch">
         <DocPicker label="Document A" selected={doc1} onSelect={setDoc1} docs={docs.filter(d => d._id !== doc2?._id)} />
         <div className="flex items-center text-text-tertiary">
@@ -93,7 +93,7 @@ export default function Compare() {
         {comparing ? 'Comparing…' : 'Compare Documents'}
       </button>
 
-      {/* Diff results */}
+      {}
       <AnimatePresence>
         {diff && (
           <motion.div
@@ -101,7 +101,7 @@ export default function Compare() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            {/* Summary */}
+            {}
             {diff.summary && (
               <div className="card p-4 border-sky/20 bg-sky-muted">
                 <p className="text-sm text-text-primary">{diff.summary}</p>
@@ -109,7 +109,7 @@ export default function Compare() {
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Changed */}
+              {}
               {diff.changed?.length > 0 && (
                 <div className="card p-4 sm:col-span-3">
                   <p className="text-xs font-medium text-warning mb-3 flex items-center gap-1.5">
@@ -127,7 +127,7 @@ export default function Compare() {
                 </div>
               )}
 
-              {/* Added */}
+              {}
               {diff.added?.length > 0 && (
                 <div className="card p-4">
                   <p className="text-xs font-medium text-success mb-3 flex items-center gap-1.5">
@@ -139,7 +139,7 @@ export default function Compare() {
                 </div>
               )}
 
-              {/* Removed */}
+              {}
               {diff.removed?.length > 0 && (
                 <div className="card p-4">
                   <p className="text-xs font-medium text-error mb-3 flex items-center gap-1.5">

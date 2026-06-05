@@ -1,5 +1,5 @@
-// ─── Login Page ───────────────────────────────────────────────────────────────
-// Simple login form — no react-hook-form, just useState
+
+
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -20,7 +20,7 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Simple client-side validation before submitting
+
   const validate = () => {
     const newErrors = {};
     if (!email)                          newErrors.email    = 'Email is required';
@@ -38,10 +38,10 @@ export default function Login() {
     try {
       const res = await authAPI.login({ email, password });
 
-      // Save user + token to Redux (and localStorage automatically via slice)
+
       dispatch(setAuth({
         user:  res.data.user,
-        token: res.data.token,  // single token — simple!
+        token: res.data.token,
       }));
 
       toast.success('Welcome back!');
@@ -55,7 +55,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4">
-      {/* Dot grid background */}
+      {}
       <div
         className="fixed inset-0 opacity-[0.03]"
         style={{ backgroundImage: 'radial-gradient(#38BDF8 1px, transparent 1px)', backgroundSize: '40px 40px' }}
@@ -67,7 +67,7 @@ export default function Login() {
         transition={{ duration: 0.35 }}
         className="w-full max-w-sm relative z-10"
       >
-        {/* Logo */}
+        {}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-9 h-9 rounded-xl bg-sky-muted border border-sky/30 flex items-center justify-center">
             <Zap className="w-5 h-5 text-sky" />
@@ -82,7 +82,7 @@ export default function Login() {
           <p className="text-text-tertiary text-sm mb-6">Access your document intelligence hub</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
+            {}
             <div>
               <label className="text-xs font-medium text-text-secondary mb-1.5 block">Email</label>
               <div className="relative">
@@ -99,7 +99,7 @@ export default function Login() {
               {errors.email && <p className="text-error text-xs mt-1">{errors.email}</p>}
             </div>
 
-            {/* Password */}
+            {}
             <div>
               <label className="text-xs font-medium text-text-secondary mb-1.5 block">Password</label>
               <div className="relative">

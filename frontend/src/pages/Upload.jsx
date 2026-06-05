@@ -17,7 +17,7 @@ export default function Upload() {
         </p>
       </div>
 
-      {/* Mode toggle */}
+      {}
       <div className="flex gap-2 p-1 bg-bg-elevated rounded-btn w-fit border border-border">
         {[
           { key: 'single', icon: UploadIcon, label: 'Single Upload' },
@@ -43,7 +43,7 @@ export default function Upload() {
         <UploadZone batch={mode === 'batch'} onSuccess={() => setTimeout(() => navigate('/documents'), 800)} />
       </motion.div>
 
-      {/* Supported docs */}
+      {}
       <div className="card p-5">
         <p className="text-xs font-medium text-text-secondary mb-3">Supported Document Types</p>
         <div className="flex flex-wrap gap-2">

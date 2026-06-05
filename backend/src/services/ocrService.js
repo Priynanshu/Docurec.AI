@@ -1,13 +1,7 @@
-// ─── OCR Service ─────────────────────────────────────────────────────────────
-// Step 1: Tesseract reads raw text from image (local, fast)
-// Step 2: Gemini cleans + structures the text (smart)
-
 const Tesseract = require('tesseract.js');
 const { generateText } = require('../config/ai');
-const { OCRError, AIError } = require('../utils/errors');
-const logger = require('../utils/logger');
+const ApiError = require('../utils/ApiError');
 
-// ── Step 1: Run Tesseract OCR on image ───────────────────────────────────────
 const runTesseract = async (imageBuffer) => {
   const startTime = Date.now();
   try {
@@ -20,12 +14,10 @@ const runTesseract = async (imageBuffer) => {
       timeMs:     Date.now() - startTime,
     };
   } catch (error) {
-    logger.error('Tesseract failed: ' + error.message);
-    throw new OCRError('Could not read text from image: ' + error.message);
+    throw new ApiError(422, 'Could not read text from image: ' + error.message);
   }
 };
 
-// ── Step 2: Gemini analysis ───────────────────────────────────────────────────
 const processWithGemini = async (rawOcrText) => {
   const prompt = `
 You are an expert OCR correction AI specializing in Indian government documents (Aadhaar, PAN card, land records, court notices, voter ID, ration card, certificates, etc).
@@ -44,7 +36,7 @@ YOUR TASKS:
 5. Extract ALL visible fields — name, dob, id numbers, address, father name, gender, pincode, etc
 6. Flag PII fields (aadhaar_number, pan_number, phone, address, dob)
 7. Write correctedText as clean, human-readable paragraphs — NOT raw OCR dump. Format it nicely with proper line breaks and labels.
-8. Give confidenceScore: 
+8. Give confidenceScore:
    - Even blurry/partial text should score 55-70 (something was extracted)
    - Clear text scores 80-99
    - Only give below 50 if NOTHING could be read at all
@@ -54,14 +46,14 @@ IMPORTANT RULES:
 - correctedText must be FORMATTED and READABLE — like a proper document summary with labels
 - Example correctedText format:
   "Document Type: Aadhaar Card
-   
+
    Name: Rajesh Kumar
    Date of Birth: 15/08/1985
    Gender: Male
    Aadhaar Number: 1234 5678 9012
-   
+
    Address: 123 Gandhi Nagar, New Delhi - 110001
-   
+
    Issued by: Government of India"
 - extractedFields must list every piece of data you found
 - ONLY return valid JSON — no markdown, no extra text
@@ -101,21 +93,18 @@ ${rawOcrText}
     const rawResponse = await generateText(prompt);
     const cleaned = rawResponse.replace(/```json|```/g, '').trim();
     return JSON.parse(cleaned);
+
   } catch (error) {
     if (error instanceof SyntaxError) {
-      logger.warn('Gemini returned invalid JSON, using fallback');
       return buildFallbackResult(rawOcrText);
     }
-    logger.error('Gemini OCR failed: ' + error.message);
-    throw new AIError('AI document analysis failed: ' + error.message);
+    throw new ApiError(503, 'AI document analysis failed: ' + error.message);
   }
 };
 
-// Fallback when Gemini fails completely
 const buildFallbackResult = (rawText) => ({
   detectedLanguages: ['english'],
   primaryLanguage:   'english',
-  // Format the raw text somewhat readably even in fallback
   correctedText: rawText
     ? 'Extracted Text:\n\n' + rawText.replace(/\n{3,}/g, '\n\n').trim()
     : 'Could not extract text from this document.',
@@ -124,7 +113,7 @@ const buildFallbackResult = (rawText) => ({
   piiFields:         [],
   hasPII:            false,
   structuredContent: { sections: [] },
-  confidenceScore:   55,  // bump up fallback — something was read
+  confidenceScore:   55,
   healthScore:       50,
   healthDetails: {
     clarity:      50,
@@ -134,7 +123,6 @@ const buildFallbackResult = (rawText) => ({
   },
 });
 
-// ── Full pipeline ─────────────────────────────────────────────────────────────
 const processDocument = async (imageBuffer, mimeType) => {
   const startTime = Date.now();
   let rawOcrText = '';

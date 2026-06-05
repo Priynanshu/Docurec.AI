@@ -16,13 +16,13 @@ const chatSessionSchema = new mongoose.Schema(
       index: true,
     },
     title: { type: String, default: 'New Chat' },
-    // if scoped to a single document
+
     documentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Document',
       default: null,
     },
-    // if global (RAG across all docs)
+
     isGlobal: { type: Boolean, default: false },
     messages: [messageSchema],
     lastMessageAt: { type: Date, default: Date.now },

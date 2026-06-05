@@ -76,12 +76,12 @@
     @apply badge bg-[rgba(248,113,113,0.1)] text-error;
   }
 
-  /* Active nav item */
+
   .nav-active {
     @apply border-l-2 border-sky bg-sky-muted text-sky;
   }
 
-  /* OCR scan animation overlay */
+
   .scan-overlay {
     position: absolute;
     left: 0; right: 0;
@@ -91,7 +91,7 @@
     pointer-events: none;
   }
 
-  /* Skeleton shimmer */
+
   .skeleton {
     @apply bg-bg-elevated rounded animate-pulse;
     background: linear-gradient(90deg, #1A1A24 25%, #2A2A38 50%, #1A1A24 75%);
@@ -104,7 +104,7 @@
     100% { background-position: -200% 0; }
   }
 
-  /* Page transition container */
+
   .page-wrapper {
     @apply min-h-screen bg-bg-primary;
   }

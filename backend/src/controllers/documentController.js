@@ -10,16 +10,11 @@ const {
 } = require('../services/documentService');
 const { translateDocument, compareDocuments } = require('../services/aiService');
 const { sendSuccess, sendCreated, sendPaginated } = require('../utils/response');
-const { ValidationError } = require('../utils/errors');
-const logger = require('../utils/logger');
+const ApiError = require('../utils/ApiError');
 
-/**
- * POST /api/v1/documents/upload
- * Single document upload
- */
 const upload = async (req, res, next) => {
   try {
-    if (!req.file) throw new ValidationError('No file uploaded');
+    if (!req.file) throw new ApiError(400, 'No file uploaded');
 
     const doc = await createDocument(
       req.user._id,
@@ -29,10 +24,7 @@ const upload = async (req, res, next) => {
       req.file.size
     );
 
-    // Process asynchronously (in production this would be a queue job)
-    processDocumentById(doc._id.toString(), req.file.buffer).catch((e) =>
-      logger.error(`Background OCR failed for doc ${doc._id}: ${e.message}`)
-    );
+    processDocumentById(doc._id.toString(), req.file.buffer).catch(() => {});
 
     return sendCreated(res, { document: doc }, 'Document uploaded and processing started');
   } catch (error) {
@@ -40,13 +32,9 @@ const upload = async (req, res, next) => {
   }
 };
 
-/**
- * POST /api/v1/documents/batch-upload
- * Batch upload (up to 50 files)
- */
 const batchUpload = async (req, res, next) => {
   try {
-    if (!req.files || !req.files.length) throw new ValidationError('No files uploaded');
+    if (!req.files || !req.files.length) throw new ApiError(400, 'No files uploaded');
 
     const results = await Promise.allSettled(
       req.files.map(async (file) => {
@@ -57,9 +45,7 @@ const batchUpload = async (req, res, next) => {
           file.mimetype,
           file.size
         );
-        processDocumentById(doc._id.toString(), file.buffer).catch((e) =>
-          logger.error(`Background OCR failed for doc ${doc._id}: ${e.message}`)
-        );
+        processDocumentById(doc._id.toString(), file.buffer).catch(() => {});
         return doc;
       })
     );
@@ -78,9 +64,6 @@ const batchUpload = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/v1/documents
- */
 const getDocuments = async (req, res, next) => {
   try {
     const { page = 1, limit = 12, status, type, language, search, sort } = req.query;
@@ -94,9 +77,6 @@ const getDocuments = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/v1/documents/:id
- */
 const getDocument = async (req, res, next) => {
   try {
     const doc = await getDocumentById(req.params.id, req.user._id);
@@ -106,9 +86,6 @@ const getDocument = async (req, res, next) => {
   }
 };
 
-/**
- * POST /api/v1/documents/:id/mask-pii
- */
 const maskPII = async (req, res, next) => {
   try {
     const { mask = true } = req.body;
@@ -119,13 +96,10 @@ const maskPII = async (req, res, next) => {
   }
 };
 
-/**
- * PATCH /api/v1/documents/:id/correct
- */
 const correctDocumentField = async (req, res, next) => {
   try {
     const { field, value } = req.body;
-    if (!field || value === undefined) throw new ValidationError('field and value are required');
+    if (!field || value === undefined) throw new ApiError(400, 'field and value are required');
     const doc = await correctField(req.params.id, req.user._id, field, value);
     return sendSuccess(res, { document: doc }, 'Field corrected');
   } catch (error) {
@@ -133,9 +107,6 @@ const correctDocumentField = async (req, res, next) => {
   }
 };
 
-/**
- * DELETE /api/v1/documents/:id
- */
 const deleteDoc = async (req, res, next) => {
   try {
     await deleteDocument(req.params.id, req.user._id);
@@ -145,9 +116,6 @@ const deleteDoc = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/v1/documents/analytics
- */
 const analytics = async (req, res, next) => {
   try {
     const data = await getUserAnalytics(req.user._id.toString());
@@ -157,13 +125,10 @@ const analytics = async (req, res, next) => {
   }
 };
 
-/**
- * POST /api/v1/documents/:id/translate
- */
 const translate = async (req, res, next) => {
   try {
     const { language } = req.body;
-    if (!language) throw new ValidationError('language is required');
+    if (!language) throw new ApiError(400, 'language is required');
     const translatedText = await translateDocument(req.params.id, language);
     return sendSuccess(res, { translatedText, language });
   } catch (error) {
@@ -171,13 +136,10 @@ const translate = async (req, res, next) => {
   }
 };
 
-/**
- * POST /api/v1/documents/compare
- */
 const compare = async (req, res, next) => {
   try {
     const { docId1, docId2 } = req.body;
-    if (!docId1 || !docId2) throw new ValidationError('Both docId1 and docId2 are required');
+    if (!docId1 || !docId2) throw new ApiError(400, 'Both docId1 and docId2 are required');
     const diff = await compareDocuments(docId1, docId2, req.user._id);
     return sendSuccess(res, { diff });
   } catch (error) {
@@ -185,9 +147,6 @@ const compare = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/v1/documents/:id/status  (SSE for real-time processing status)
- */
 const statusStream = async (req, res, next) => {
   try {
     const Document = require('../models/Document');

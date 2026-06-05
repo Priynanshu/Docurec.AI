@@ -1,13 +1,8 @@
-// ─── AI Service (Chat + Translate + Compare) ──────────────────────────────────
-// Uses Google Gemini via @langchain/google-genai
-
-const { generateText, generateWithHistory, generateWithSystem } = require('../config/ai');
+const { generateText, generateWithHistory } = require('../config/ai');
 const Document    = require('../models/Document');
 const ChatSession = require('../models/ChatSession');
-const { AIError } = require('../utils/errors');
-const logger      = require('../utils/logger');
+const ApiError = require('../utils/ApiError');
 
-// ── Helper: Get user's relevant documents as context for AI chat ──────────────
 const getDocumentContext = async (userId, query, documentId = null) => {
   let docs;
 
@@ -46,14 +41,13 @@ const getDocumentContext = async (userId, query, documentId = null) => {
     id:         doc._id.toString(),
     title:      doc.title || doc.documentType || 'Document',
     type:       doc.documentType,
-    text:       (doc.extractedText || '').substring(0, 1500), 
+    text:       (doc.extractedText || '').substring(0, 1500),
     fields:     (doc.extractedFields || []).slice(0, 15),
     languages:  doc.detectedLanguages || [],
     confidence: doc.confidenceScore || 0,
   }));
 };
 
-// ── Helper: Format docs into readable text for the AI prompt ─────────────────
 const buildContextString = (docs) => {
   if (!docs.length) {
     return 'The user has no processed documents in their library yet.';
@@ -65,10 +59,10 @@ const buildContextString = (docs) => {
   ).join('\n\n---\n\n');
 };
 
-// ── Chat: Send a message, get AI response using conversation history ───────────
+
 const chat = async (sessionId, userMessage, userId, documentId = null) => {
   const session = await ChatSession.findOne({ _id: sessionId, userId });
-  if (!session) throw new AIError('Chat session not found');
+  if (!session) throw new ApiError(404, 'Chat session not found');
 
   const docs = await getDocumentContext(userId, userMessage, documentId);
   const contextString = buildContextString(docs);
@@ -85,7 +79,6 @@ RULES:
 USER'S DOCUMENTS:
 ${contextString}`;
 
-  // Keep last 8 messages for memory context optimization
   const recentHistory = session.messages.slice(-8);
   const messageHistory = [
     ...recentHistory.map((m) => ({ role: m.role, content: m.content })),
@@ -95,7 +88,6 @@ ${contextString}`;
   try {
     const assistantReply = await generateWithHistory(systemPrompt, messageHistory);
 
-    // Push inputs and results directly into the database schema
     session.messages.push({ role: 'user', content: userMessage });
     session.messages.push({
       role:    'assistant',
@@ -112,16 +104,14 @@ ${contextString}`;
 
     return { message: assistantReply, sources: docs };
   } catch (error) {
-    logger.error('Gemini chat error: ' + error.message);
-    throw new AIError('Chat failed: ' + error.message);
+    throw new ApiError(500, 'Chat failed: ' + error.message);
   }
 };
 
-// ── Translate document text to another language ───────────────────────────────
 const translateDocument = async (documentId, targetLanguage) => {
   const doc = await Document.findById(documentId).select('extractedText documentType title');
-  if (!doc) throw new Error('Document not found');
-  if (!doc.extractedText) throw new Error('No text to translate');
+  if (!doc) throw new ApiError(404, 'Document not found');
+  if (!doc.extractedText) throw new ApiError(400, 'No text to translate');
 
   const prompt = `Translate this Indian document text to ${targetLanguage}.
 Keep the same structure and meaning.
@@ -133,14 +123,13 @@ ${doc.extractedText}`;
   return await generateText(prompt);
 };
 
-// ── Compare two documents and return differences ──────────────────────────────
 const compareDocuments = async (docId1, docId2, userId) => {
   const [doc1, doc2] = await Promise.all([
     Document.findOne({ _id: docId1, userId }).select('title extractedText extractedFields documentType'),
     Document.findOne({ _id: docId2, userId }).select('title extractedText extractedFields documentType'),
   ]);
 
-  if (!doc1 || !doc2) throw new Error('One or both documents not found');
+  if (!doc1 || !doc2) throw new ApiError(404, 'One or both documents not found');
 
   const prompt = `Compare these two Indian documents and find differences.
 
@@ -164,9 +153,9 @@ Return ONLY valid JSON in this exact format (no extra text):
     const rawResponse = await generateText(prompt);
     const cleaned = rawResponse.replace(/```json|```/g, '').trim();
     return JSON.parse(cleaned);
+
   } catch (error) {
-    logger.error('Compare documents failed: ' + error.message);
-    throw new AIError('Document comparison failed. Please try again.');
+    throw new ApiError(500, 'Document comparison failed. Please try again.');
   }
 };
 

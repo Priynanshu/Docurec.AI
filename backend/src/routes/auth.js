@@ -4,7 +4,7 @@ const { authenticate } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
 const { body, validationResult } = require('express-validator');
 
-// Inline validation rules (simple, beginner friendly)
+
 const validateRegister = [
   body('name').trim().isLength({ min: 2, max: 60 }).withMessage('Name must be 2-60 characters'),
   body('email').isEmail().normalizeEmail().withMessage('Enter a valid email address'),
@@ -19,19 +19,19 @@ const validateLogin = [
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
-// Middleware to return validation errors
+
 const checkValidation = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
-      message: errors.array()[0].msg, // just return the first error message
+      message: errors.array()[0].msg,
     });
   }
   next();
 };
 
-// Routes
+
 router.post('/register', authLimiter, validateRegister, checkValidation, register);
 router.post('/login',    authLimiter, validateLogin,    checkValidation, login);
 router.post('/logout',   authenticate, logout);

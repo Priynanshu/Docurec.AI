@@ -9,7 +9,7 @@ const { uploadLimiter, apiLimiter } = require('../middleware/rateLimiter');
 const { uploadSingle, uploadBatch } = require('../middleware/upload');
 const { documentIdRule, paginationRules, validate } = require('../middleware/validators');
 
-// All routes require authentication
+
 router.use(authenticate);
 
 router.get('/analytics', analytics);

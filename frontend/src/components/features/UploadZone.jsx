@@ -120,7 +120,7 @@ export default function UploadZone({ onSuccess, batch = false }) {
 
   return (
     <div className="space-y-4">
-      {/* Drop Zone */}
+      {}
       <motion.div
         {...getRootProps()}
         animate={{
@@ -153,7 +153,7 @@ export default function UploadZone({ onSuccess, batch = false }) {
         </motion.div>
       </motion.div>
 
-      {/* File list */}
+      {}
       <AnimatePresence>
         {files.length > 0 && (
           <motion.div

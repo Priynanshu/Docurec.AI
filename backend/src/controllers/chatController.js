@@ -1,13 +1,8 @@
-// ─── Chat Controller ──────────────────────────────────────────────────────────
-// Handles all chat session API routes
-
 const ChatSession = require('../models/ChatSession');
 const { chat } = require('../services/aiService');
 const { sendSuccess, sendCreated } = require('../utils/response');
-const { NotFoundError, ValidationError } = require('../utils/errors');
+const ApiError = require('../utils/ApiError');
 
-// ── POST /api/v1/chat/sessions ────────────────────────────────────────────────
-// Create a new chat session
 const createSession = async (req, res, next) => {
   try {
     const { documentId, isGlobal = false, title } = req.body;
@@ -25,8 +20,6 @@ const createSession = async (req, res, next) => {
   }
 };
 
-// ── GET /api/v1/chat/sessions ─────────────────────────────────────────────────
-// Get all chat sessions for the logged-in user
 const getSessions = async (req, res, next) => {
   try {
     const sessions = await ChatSession.find({
@@ -35,7 +28,7 @@ const getSessions = async (req, res, next) => {
     })
       .sort({ lastMessageAt: -1 })
       .limit(50)
-      .select('-messages') // don't load all messages in list view
+      .select('-messages')
       .populate('documentId', 'title documentType');
 
     return sendSuccess(res, { sessions });
@@ -44,8 +37,6 @@ const getSessions = async (req, res, next) => {
   }
 };
 
-// ── GET /api/v1/chat/sessions/:id ─────────────────────────────────────────────
-// Get a single session with all messages
 const getSession = async (req, res, next) => {
   try {
     const session = await ChatSession.findOne({
@@ -53,7 +44,7 @@ const getSession = async (req, res, next) => {
       userId: req.user._id,
     }).populate('documentId', 'title documentType imageKit');
 
-    if (!session) throw new NotFoundError('Chat session');
+    if (!session) throw new ApiError(404, 'Chat session not found');
 
     return sendSuccess(res, { session });
   } catch (error) {
@@ -61,25 +52,20 @@ const getSession = async (req, res, next) => {
   }
 };
 
-// ── POST /api/v1/chat/sessions/:id/message ────────────────────────────────────
-// Send a message and get AI response (non-streaming, works with Gemini)
 const sendMessage = async (req, res, next) => {
   try {
     const { message } = req.body;
 
-    // Validate
     if (!message || !message.trim()) {
-      throw new ValidationError('Message cannot be empty');
+      throw new ApiError(400, 'Message cannot be empty');
     }
 
-    // Check session exists and belongs to user
     const session = await ChatSession.findOne({
       _id: req.params.id,
       userId: req.user._id,
     });
-    if (!session) throw new NotFoundError('Chat session');
+    if (!session) throw new ApiError(404, 'Chat session not found');
 
-    // Call Gemini AI to get a response
     const result = await chat(
       session._id,
       message.trim(),
@@ -96,8 +82,6 @@ const sendMessage = async (req, res, next) => {
   }
 };
 
-// ── DELETE /api/v1/chat/sessions/:id ──────────────────────────────────────────
-// Soft-delete a session
 const deleteSession = async (req, res, next) => {
   try {
     await ChatSession.findOneAndUpdate(

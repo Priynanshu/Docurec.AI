@@ -6,7 +6,7 @@ const { cacheDel } = require('../config/redis');
 
 router.use(authenticate);
 
-// GET /api/v1/users/profile
+
 router.get('/profile', async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
@@ -14,7 +14,7 @@ router.get('/profile', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// PATCH /api/v1/users/profile
+
 router.patch('/profile', async (req, res, next) => {
   try {
     const { name, preferences } = req.body;
@@ -28,7 +28,7 @@ router.patch('/profile', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// PATCH /api/v1/users/password
+
 router.patch('/password', async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;

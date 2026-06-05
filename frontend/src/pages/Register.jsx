@@ -1,6 +1,6 @@
-// ─── Register Page ────────────────────────────────────────────────────────────
-// Single step: fill form → account created → immediately logged in
-// No OTP, no email verification — simple!
+
+
+
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ export default function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Validate form fields before submitting
+
   const validate = () => {
     const newErrors = {};
     if (!name || name.length < 2)          newErrors.name     = 'Name must be at least 2 characters';
@@ -40,13 +40,13 @@ export default function Register() {
 
     setLoading(true);
     try {
-      // Register — backend returns token + user immediately
+
       const res = await authAPI.register({ name, email, password });
 
-      // Log user in right away (no OTP step!)
+
       dispatch(setAuth({
         user:  res.data.user,
-        token: res.data.token,  // single token
+        token: res.data.token,
       }));
 
       toast.success('Welcome to DocuRec AI!');
@@ -60,7 +60,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4">
-      {/* Dot grid background */}
+      {}
       <div
         className="fixed inset-0 opacity-[0.03]"
         style={{ backgroundImage: 'radial-gradient(#38BDF8 1px, transparent 1px)', backgroundSize: '40px 40px' }}
@@ -71,7 +71,7 @@ export default function Register() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm relative z-10"
       >
-        {/* Logo */}
+        {}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-9 h-9 rounded-xl bg-sky-muted border border-sky/30 flex items-center justify-center">
             <Zap className="w-5 h-5 text-sky" />
@@ -84,7 +84,7 @@ export default function Register() {
           <p className="text-text-tertiary text-sm mb-6">Start processing Indian documents with AI</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name */}
+            {}
             <div>
               <label className="text-xs font-medium text-text-secondary mb-1.5 block">Full Name</label>
               <div className="relative">
@@ -101,7 +101,7 @@ export default function Register() {
               {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
             </div>
 
-            {/* Email */}
+            {}
             <div>
               <label className="text-xs font-medium text-text-secondary mb-1.5 block">Email</label>
               <div className="relative">
@@ -118,7 +118,7 @@ export default function Register() {
               {errors.email && <p className="text-error text-xs mt-1">{errors.email}</p>}
             </div>
 
-            {/* Password */}
+            {}
             <div>
               <label className="text-xs font-medium text-text-secondary mb-1.5 block">Password</label>
               <div className="relative">

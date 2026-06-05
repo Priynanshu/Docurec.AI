@@ -1,5 +1,5 @@
-// ─── AI Chat Page ─────────────────────────────────────────────────────────────
-// Fully responsive: sidebar on desktop, drawer on mobile
+
+
 
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { chatAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import { Skeleton } from '../components/ui/skeleton';
 
-// Animated typing dots — shown while AI is thinking
+
 function TypingDots() {
   return (
     <div className="flex items-center gap-1 py-1">
@@ -26,7 +26,7 @@ function TypingDots() {
   );
 }
 
-// Single chat message bubble
+
 function Message({ msg }) {
   const isUser = msg.role === 'user';
   return (
@@ -36,7 +36,7 @@ function Message({ msg }) {
       transition={{ duration: 0.2 }}
       className={`flex gap-2 sm:gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
     >
-      {/* Avatar */}
+      {}
       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5
         ${isUser ? 'bg-sky' : 'bg-bg-elevated border border-sky/30'}`}>
         {isUser
@@ -44,7 +44,7 @@ function Message({ msg }) {
           : <Zap className="w-3.5 h-3.5 text-sky" />}
       </div>
 
-      {/* Message bubble */}
+      {}
       <div className={`flex flex-col gap-1 max-w-[78%] sm:max-w-[72%] ${isUser ? 'items-end' : 'items-start'}`}>
         <div className={`px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl text-sm leading-relaxed
           ${isUser
@@ -53,7 +53,7 @@ function Message({ msg }) {
           }`}>
           {msg.content}
         </div>
-        {/* Source badges */}
+        {}
         {msg.sources?.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {msg.sources.map((s, i) => (
@@ -66,7 +66,7 @@ function Message({ msg }) {
   );
 }
 
-// Sessions list — used in both desktop sidebar and mobile drawer
+
 function SessionsList({ sessions, activeId, onSelect, onDelete, onCreate, creating }) {
   return (
     <div className="flex flex-col h-full">
@@ -105,7 +105,7 @@ function SessionsList({ sessions, activeId, onSelect, onDelete, onCreate, creati
   );
 }
 
-// Quick prompt suggestions for empty chat
+
 const QUICK_PROMPTS = [
   'What documents do I have?',
   'Find any low confidence documents',
@@ -114,7 +114,7 @@ const QUICK_PROMPTS = [
 ];
 
 export default function Chat() {
-  // If we came from /documents/:id/chat, grab the document ID from URL
+
   const { id: documentIdFromUrl } = useParams();
 
   const [activeSessionId, setActiveSessionId] = useState(null);
@@ -124,53 +124,53 @@ export default function Chat() {
   const messagesEndRef = useRef(null);
   const qc = useQueryClient();
 
-  // Fetch all chat sessions
+
   const { data: sessionsData } = useQuery({
     queryKey: ['chatSessions'],
     queryFn: chatAPI.getSessions,
-    staleTime: Infinity,  // keep sessions in cache forever — won't disappear on navigation
+    staleTime: Infinity,
   });
 
-  // Fetch active session messages
+
   const { data: sessionData, isLoading: sessionLoading } = useQuery({
     queryKey: ['chatSession', activeSessionId],
     queryFn: () => chatAPI.getSession(activeSessionId),
     enabled: !!activeSessionId,
-    staleTime: 60000,  // keep messages in cache 1 min
+    staleTime: 60000,
   });
 
   const sessions = sessionsData?.data?.sessions || [];
 
-  // Auto-create a session if we came from a document page and have no active session
+
   useEffect(() => {
     if (documentIdFromUrl && !activeSessionId && !createSession.isPending) {
-      // Check if there's already a session for this document
+
       const existingSession = sessions.find(
         s => s.documentId && String(s.documentId._id || s.documentId) === documentIdFromUrl
       );
       if (existingSession) {
         setActiveSessionId(existingSession._id);
       } else if (sessions.length >= 0 && sessionsData) {
-        // Create a new session for this document
+
         createSession.mutate();
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [documentIdFromUrl, sessionsData]);
   const currentSession = sessionData?.data?.session;
 
-  // Create new session
+
   const createSession = useMutation({
     mutationFn: () => chatAPI.createSession({ isGlobal: !documentIdFromUrl, documentId: documentIdFromUrl || null }),
     onSuccess: (res) => {
       setActiveSessionId(res.data.session._id);
-      setShowMobileSidebar(false); // close mobile drawer after creating
+      setShowMobileSidebar(false);
       qc.invalidateQueries({ queryKey: ['chatSessions'] });
     },
     onError: () => toast.error('Could not create chat'),
   });
 
-  // Delete a session
+
   const deleteSession = useMutation({
     mutationFn: chatAPI.deleteSession,
     onSuccess: (_, deletedId) => {
@@ -179,12 +179,12 @@ export default function Chat() {
     },
   });
 
-  // Auto-scroll to latest message
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentSession?.messages, isTyping]);
 
-  // Send a message
+
   const sendMessage = async () => {
     const text = message.trim();
     if (!text || !activeSessionId || isTyping) return;
@@ -192,7 +192,7 @@ export default function Chat() {
     setMessage('');
     setIsTyping(true);
 
-    // Optimistically add user message to UI immediately
+
     qc.setQueryData(['chatSession', activeSessionId], (old) => {
       if (!old?.data?.session) return old;
       return {
@@ -212,7 +212,7 @@ export default function Chat() {
 
     try {
       await chatAPI.sendMessage(activeSessionId, text);
-      // Refresh to get AI response
+
       qc.invalidateQueries({ queryKey: ['chatSession', activeSessionId] });
       qc.invalidateQueries({ queryKey: ['chatSessions'] });
     } catch {
@@ -232,7 +232,7 @@ export default function Chat() {
   return (
     <div className="h-[calc(100vh-2rem)] md:h-[calc(100vh-7rem)] flex gap-0 md:gap-4 max-w-6xl mx-auto relative">
 
-      {/* ── Desktop Sidebar ── */}
+      {}
       <div className="hidden md:flex w-60 flex-shrink-0 flex-col gap-2">
         <SessionsList
           sessions={sessions}
@@ -244,11 +244,11 @@ export default function Chat() {
         />
       </div>
 
-      {/* ── Mobile Sidebar Drawer ── */}
+      {}
       <AnimatePresence>
         {showMobileSidebar && (
           <>
-            {/* Backdrop */}
+            {}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -256,7 +256,7 @@ export default function Chat() {
               onClick={() => setShowMobileSidebar(false)}
               className="fixed inset-0 bg-black/60 z-40 md:hidden"
             />
-            {/* Drawer panel */}
+            {}
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
@@ -285,12 +285,12 @@ export default function Chat() {
         )}
       </AnimatePresence>
 
-      {/* ── Main Chat Window ── */}
+      {}
       <div className="flex-1 card flex flex-col overflow-hidden min-w-0">
 
-        {/* Chat header (mobile shows menu button) */}
+        {}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border flex-shrink-0">
-          {/* Mobile menu button */}
+          {}
           <button
             onClick={() => setShowMobileSidebar(true)}
             className="md:hidden text-text-secondary hover:text-text-primary"
@@ -310,10 +310,10 @@ export default function Chat() {
 
         {activeSessionId ? (
           <>
-            {/* Messages area */}
+            {}
             <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
               {sessionLoading ? (
-                // Skeleton loading state
+
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className={`flex gap-3 ${i % 2 === 0 ? 'flex-row-reverse' : ''}`}>
@@ -324,7 +324,7 @@ export default function Chat() {
                 </div>
               ) : (
                 <>
-                  {/* Empty state with quick prompts */}
+                  {}
                   {(!currentSession?.messages || currentSession.messages.length === 0) && (
                     <div className="text-center py-8 sm:py-12">
                       <div className="w-14 h-14 rounded-full bg-sky-muted border border-sky/20 flex items-center justify-center mx-auto mb-4">
@@ -346,12 +346,12 @@ export default function Chat() {
                     </div>
                   )}
 
-                  {/* Messages */}
+                  {}
                   {currentSession?.messages?.map((msg, i) => (
                     <Message key={msg._id || i} msg={msg} />
                   ))}
 
-                  {/* Typing indicator */}
+                  {}
                   {isTyping && (
                     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex gap-3">
                       <div className="w-7 h-7 rounded-full bg-bg-elevated border border-sky/30 flex items-center justify-center">
@@ -367,7 +367,7 @@ export default function Chat() {
               )}
             </div>
 
-            {/* Message input */}
+            {}
             <div className="border-t border-border p-3 sm:p-4 flex-shrink-0">
               <div className="flex items-end gap-2">
                 <textarea
@@ -392,7 +392,7 @@ export default function Chat() {
             </div>
           </>
         ) : (
-          // No session selected — show welcome screen
+
           <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center p-6 sm:p-8">
             <div className="w-16 h-16 rounded-full bg-sky-muted border border-sky/20 flex items-center justify-center">
               <MessageSquare className="w-8 h-8 text-sky" />
@@ -404,7 +404,7 @@ export default function Chat() {
             <button onClick={() => createSession.mutate()} className="btn-primary flex items-center gap-2">
               <Plus className="w-4 h-4" /> New Chat
             </button>
-            {/* On mobile, also show how to open sessions */}
+            {}
             <p className="text-text-tertiary text-xs md:hidden">
               Tap the <Menu className="w-3 h-3 inline" /> menu to see previous chats
             </p>

@@ -1,6 +1,6 @@
-// ─── Document Detail Page ────────────────────────────────────────────────────
-// Shows original scan + extracted data side by side
-// Auto-polls while document is processing so status updates without page reload
+
+
+
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
@@ -15,7 +15,7 @@ import { documentAPI } from '../services/api';
 import { Skeleton } from '../components/ui/skeleton';
 import toast from 'react-hot-toast';
 
-// ── Confidence bar ────────────────────────────────────────────────────────────
+
 function ConfidenceBar({ score }) {
   const color = score >= 80 ? '#22D3EE' : score >= 60 ? '#F59E0B' : '#F87171';
   return (
@@ -34,7 +34,7 @@ function ConfidenceBar({ score }) {
   );
 }
 
-// ── Editable field row ────────────────────────────────────────────────────────
+
 function EditableField({ fieldKey, value, confidence, isMasked, onSave }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal]         = useState(value);
@@ -80,7 +80,7 @@ const LANG_FLAGS = {
   tamil: '🇮🇳', telugu: '🇮🇳', marathi: '🇮🇳', gujarati: '🇮🇳',
 };
 
-// ── Status badge ──────────────────────────────────────────────────────────────
+
 function StatusBadge({ status }) {
   const configs = {
     completed:    { icon: CheckCircle, color: 'text-success',  bg: 'bg-[rgba(34,211,238,0.1)]',  label: 'Completed' },
@@ -99,7 +99,7 @@ function StatusBadge({ status }) {
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+
 export default function DocumentDetail() {
   const { id }       = useParams();
   const navigate     = useNavigate();
@@ -110,27 +110,27 @@ export default function DocumentDetail() {
   const [translatedText, setTranslatedText] = useState('');
   const [translating, setTranslating]     = useState(false);
 
-  // Check if we came from the "Ask AI" button on a document
-  // If so, open chat scoped to this document
+
+
   const fromDocumentChat = location.pathname.endsWith('/chat');
 
-  // ── Fetch document ──────────────────────────────────────────────────────────
+
   const { data, isLoading } = useQuery({
     queryKey: ['document', id],
     queryFn:  () => documentAPI.getById(id),
-    // Poll every 3 seconds while document is processing/queued
-    // Stops automatically when status becomes completed/failed/needs_review
+
+
     refetchInterval: (query) => {
       const status = query.state.data?.data?.document?.status;
-      if (status === 'processing' || status === 'queued') return 3000; // poll every 3s
-      return false; // stop polling
+      if (status === 'processing' || status === 'queued') return 3000;
+      return false;
     },
     staleTime: 10000,
   });
 
   const doc = data?.data?.document;
 
-  // Show a toast when processing finishes
+
   const prevStatusRef = useState(null);
   useEffect(() => {
     if (!doc) return;
@@ -146,7 +146,7 @@ export default function DocumentDetail() {
     prevStatusRef[0] = doc.status;
   }, [doc?.status]);
 
-  // ── Mutations ───────────────────────────────────────────────────────────────
+
   const maskMutation = useMutation({
     mutationFn: ({ mask }) => documentAPI.maskPII(id, mask),
     onSuccess: () => {
@@ -180,7 +180,7 @@ export default function DocumentDetail() {
 
   const healthColor = (s) => s >= 80 ? 'text-success' : s >= 60 ? 'text-warning' : 'text-error';
 
-  // ── Loading skeleton ────────────────────────────────────────────────────────
+
   if (isLoading) return (
     <div className="max-w-6xl mx-auto space-y-4">
       <Skeleton className="h-8 w-48 rounded" />
@@ -195,11 +195,11 @@ export default function DocumentDetail() {
     <div className="text-text-secondary text-center py-20">Document not found.</div>
   );
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+
   return (
     <div className="max-w-6xl mx-auto space-y-5">
 
-      {/* Header */}
+      {}
       <div className="flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="btn-ghost p-2">
           <ArrowLeft className="w-4 h-4" />
@@ -231,7 +231,7 @@ export default function DocumentDetail() {
                 : <><ShieldOff className="w-3.5 h-3.5" /> Mask PII</>}
             </button>
           )}
-          {/* Ask AI button — navigates to /documents/:id/chat */}
+          {}
           <Link
             to={`/documents/${id}/chat`}
             className="btn-secondary flex items-center gap-1.5 text-xs px-3 py-1.5"
@@ -244,7 +244,7 @@ export default function DocumentDetail() {
         </div>
       </div>
 
-      {/* Processing banner — shown while doc is being processed */}
+      {}
       {(doc.status === 'processing' || doc.status === 'queued') && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -262,7 +262,7 @@ export default function DocumentDetail() {
         </motion.div>
       )}
 
-      {/* Failed banner */}
+      {}
       {doc.status === 'failed' && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -277,7 +277,7 @@ export default function DocumentDetail() {
         </motion.div>
       )}
 
-      {/* Needs review banner */}
+      {}
       {doc.status === 'needs_review' && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -292,10 +292,10 @@ export default function DocumentDetail() {
         </motion.div>
       )}
 
-      {/* Main content — side by side */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-        {/* Left: Original document image */}
+        {}
         <div className="card overflow-hidden">
           <div className="p-3 border-b border-border flex items-center justify-between">
             <span className="text-xs font-medium text-text-secondary">Original Document</span>
@@ -316,7 +316,7 @@ export default function DocumentDetail() {
                 <p className="text-sm">No preview available</p>
               </div>
             )}
-            {/* Scan animation overlay while processing */}
+            {}
             {(doc.status === 'processing' || doc.status === 'queued') && (
               <div className="absolute inset-0 bg-bg-primary/40 flex flex-col items-center justify-center gap-3">
                 <div className="scan-overlay" />
@@ -327,9 +327,9 @@ export default function DocumentDetail() {
           </div>
         </div>
 
-        {/* Right: Extracted data */}
+        {}
         <div className="card flex flex-col overflow-hidden">
-          {/* Tab buttons */}
+          {}
           <div className="flex border-b border-border">
             {[
               { key: 'fields', label: 'Extracted Fields' },
@@ -349,7 +349,7 @@ export default function DocumentDetail() {
           <div className="flex-1 overflow-y-auto p-4">
             <AnimatePresence mode="wait">
 
-              {/* ── Fields tab ── */}
+              {}
               {activeTab === 'fields' && (
                 <motion.div key="fields"
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
@@ -382,13 +382,13 @@ export default function DocumentDetail() {
                 </motion.div>
               )}
 
-              {/* ── Full Text tab — structured, readable ── */}
+              {}
               {activeTab === 'text' && (
                 <motion.div key="text"
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                   className="space-y-4">
 
-                  {/* Structured text — pre-wrap preserves formatting from Gemini */}
+                  {}
                   <div className="bg-bg-elevated rounded-lg p-4 border border-border">
                     <p className="text-xs font-medium text-text-secondary mb-3 flex items-center gap-1.5">
                       <FileText className="w-3.5 h-3.5 text-sky" />
@@ -407,7 +407,7 @@ export default function DocumentDetail() {
                     )}
                   </div>
 
-                  {/* Translation section */}
+                  {}
                   <div className="border border-border rounded-lg p-3 space-y-2">
                     <p className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
                       <Languages className="w-3.5 h-3.5 text-sky" /> Translate to another language
@@ -440,13 +440,13 @@ export default function DocumentDetail() {
                 </motion.div>
               )}
 
-              {/* ── Health Score tab ── */}
+              {}
               {activeTab === 'health' && (
                 <motion.div key="health"
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                   className="space-y-4">
 
-                  {/* Big score number */}
+                  {}
                   <div className="flex items-center gap-4 p-4 bg-bg-elevated rounded-lg">
                     <div className="text-4xl font-bold"
                       style={{ color: doc.healthScore >= 80 ? '#22D3EE' : doc.healthScore >= 60 ? '#F59E0B' : '#F87171' }}>
@@ -458,7 +458,7 @@ export default function DocumentDetail() {
                     </div>
                   </div>
 
-                  {/* Sub scores */}
+                  {}
                   {doc.healthDetails && ['clarity', 'completeness', 'readability'].map(key => (
                     <div key={key}>
                       <div className="flex items-center justify-between mb-1">
@@ -471,7 +471,7 @@ export default function DocumentDetail() {
                     </div>
                   ))}
 
-                  {/* Suggestions */}
+                  {}
                   {doc.healthDetails?.suggestions?.length > 0 && (
                     <div className="space-y-2">
                       <p className="text-xs font-medium text-text-secondary">Suggestions</p>

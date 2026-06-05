@@ -1,5 +1,4 @@
 const Redis = require('ioredis');
-const logger = require('../utils/logger');
 
 let redisClient = null;
 
@@ -10,7 +9,7 @@ const connectRedis = () => {
     password: process.env.REDIS_PASSWORD || undefined,
     retryStrategy: (times) => {
       if (times > 3) {
-        logger.warn('Redis connection failed, running without cache');
+        console.warn('Redis connection failed, running without cache');
         return null;
       }
       return Math.min(times * 200, 1000);
@@ -18,11 +17,11 @@ const connectRedis = () => {
     lazyConnect: true,
   });
 
-  redisClient.on('connect', () => logger.info('Redis connected'));
-  redisClient.on('error', (err) => logger.warn(`Redis error: ${err.message}`));
+  redisClient.on('connect', () => console.log('Redis connected'));
+  redisClient.on('error', (err) => console.warn(`Redis error: ${err.message}`));
 
   redisClient.connect().catch(() => {
-    logger.warn('Redis unavailable — caching disabled');
+    console.warn('Redis unavailable — caching disabled');
   });
 
   return redisClient;
@@ -30,7 +29,6 @@ const connectRedis = () => {
 
 const getRedis = () => redisClient;
 
-// Cache helpers
 const cacheGet = async (key) => {
   try {
     if (!redisClient || redisClient.status !== 'ready') return null;
@@ -43,14 +41,14 @@ const cacheSet = async (key, value, ttlSeconds = 3600) => {
   try {
     if (!redisClient || redisClient.status !== 'ready') return;
     await redisClient.setex(key, ttlSeconds, JSON.stringify(value));
-  } catch { /* silent */ }
+  } catch { }
 };
 
 const cacheDel = async (key) => {
   try {
     if (!redisClient || redisClient.status !== 'ready') return;
     await redisClient.del(key);
-  } catch { /* silent */ }
+  } catch { }
 };
 
 const cacheDelPattern = async (pattern) => {
@@ -58,7 +56,7 @@ const cacheDelPattern = async (pattern) => {
     if (!redisClient || redisClient.status !== 'ready') return;
     const keys = await redisClient.keys(pattern);
     if (keys.length > 0) await redisClient.del(...keys);
-  } catch { /* silent */ }
+  } catch { }
 };
 
 module.exports = { connectRedis, getRedis, cacheGet, cacheSet, cacheDel, cacheDelPattern };

@@ -1,5 +1,5 @@
-// ─── UI Redux Slice ───────────────────────────────────────────────────────────
-// Manages sidebar state and any global UI state
+
+
 
 import { createSlice } from '@reduxjs/toolkit';
 

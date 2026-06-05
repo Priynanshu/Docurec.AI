@@ -1,18 +1,16 @@
-// ─── AI Config: Google Gemini via LangChain ───────────────────────────────────
-// Uses @langchain/google-genai as requested
+
+
 
 const { ChatGoogleGenerativeAI } = require('@langchain/google-genai');
 
-// Cache the client (Singleton)
+
 let chatClient = null;
 
-/**
- * Get a LangChain Gemini chat client
- */
+
 const getAIClient = () => {
   if (!chatClient) {
     chatClient = new ChatGoogleGenerativeAI({
-      model: 'gemini-2.5-flash', 
+      model: 'gemini-2.5-flash',
       apiKey: process.env.GEMINI_API_KEY,
       maxOutputTokens: 4096,
       temperature: 0.3,
@@ -21,9 +19,7 @@ const getAIClient = () => {
   return chatClient;
 };
 
-/**
- * Simple helper: send a prompt string, get a text response back
- */
+
 const generateText = async (prompt) => {
   try {
     const client = getAIClient();
@@ -35,17 +31,15 @@ const generateText = async (prompt) => {
   }
 };
 
-/**
- * Send a chat with system instruction + user message
- */
+
 const generateWithSystem = async (systemPrompt, userPrompt) => {
   try {
     const client = getAIClient();
     const { HumanMessage } = require('@langchain/core/messages');
-    
-    // Inject instructions into the message body to avoid field mismatch
+
+
     const combinedPrompt = `Instructions & Rules:\n${systemPrompt}\n\nUser Request:\n${userPrompt}`;
-    
+
     const response = await client.invoke([new HumanMessage(combinedPrompt)]);
     return response.content;
   } catch (error) {
@@ -53,9 +47,7 @@ const generateWithSystem = async (systemPrompt, userPrompt) => {
   }
 };
 
-/**
- * Send a full conversation history to Gemini
- */
+
 const generateWithHistory = async (systemPrompt, messageHistory) => {
   try {
     const client = getAIClient();
@@ -63,11 +55,11 @@ const generateWithHistory = async (systemPrompt, messageHistory) => {
 
     const messages = [];
 
-    // Map message nodes securely
+
     messageHistory.forEach((msg, index) => {
       if (msg.role === 'user') {
         if (index === 0 || messages.length === 0) {
-          // Injection fix to prevent systemInstruction parameter failures
+
           messages.push(new HumanMessage(`System Context & Rules:\n${systemPrompt}\n\nUser Message:\n${msg.content}`));
         } else {
           messages.push(new HumanMessage(msg.content));

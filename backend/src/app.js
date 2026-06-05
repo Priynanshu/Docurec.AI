@@ -7,7 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
-// Route imports
+
 const authRoutes = require('./routes/auth');
 const documentRoutes = require('./routes/documents');
 const chatRoutes = require('./routes/chat');
@@ -15,13 +15,13 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
-// ─── Security Headers ───────────────────────────────────────────────────────
+
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
-  contentSecurityPolicy: false, // configure separately for your domain
+  contentSecurityPolicy: false,
 }));
 
-// ─── CORS ────────────────────────────────────────────────────────────────────
+
 app.use(cors({
   origin: (origin, callback) => {
     const whitelist = (process.env.CLIENT_URL || 'http://localhost:5173').split(',');
@@ -33,23 +33,23 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// ─── Body Parsing ────────────────────────────────────────────────────────────
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 } else {
-  // Production me hum thoda detailed 'combined' ya custom format use kar sakte hain
+
   app.use(morgan('combined'));
 }
 
-// ─── Security Middleware ─────────────────────────────────────────────────────
-app.use(mongoSanitize()); // prevent NoSQL injection
 
-// ─── Compression ─────────────────────────────────────────────────────────────
+app.use(mongoSanitize());
+
+
 app.use(compression());
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -60,14 +60,14 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ─── API Routes ───────────────────────────────────────────────────────────────
+
 app.use('/api/v1', apiLimiter);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/documents', documentRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/users', userRoutes);
 
-// ─── 404 & Error Handling ─────────────────────────────────────────────────────
+
 app.use(notFoundHandler);
 app.use(errorHandler);
 

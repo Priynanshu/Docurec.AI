@@ -4,7 +4,7 @@ const fieldSchema = new mongoose.Schema({
   key: String,
   value: String,
   confidence: { type: Number, min: 0, max: 100 },
-  isPII: { type: Boolean, default: false },   // required — AI sets this on each field
+  isPII: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
   isMasked: { type: Boolean, default: false },
   boundingBox: {
@@ -23,7 +23,7 @@ const documentSchema = new mongoose.Schema(
     title: { type: String, trim: true },
     originalFileName: { type: String, required: true },
 
-    // ImageKit storage
+
     imageKit: {
       fileId: String,
       url: String,
@@ -31,7 +31,7 @@ const documentSchema = new mongoose.Schema(
       originalUrl: String,
     },
 
-    // Processing status
+
     status: {
       type: String,
       enum: ['queued', 'processing', 'completed', 'failed', 'needs_review'],
@@ -41,12 +41,12 @@ const documentSchema = new mongoose.Schema(
     processingError: String,
     jobId: String,
 
-    // OCR & AI results
-    rawOcrText: { type: String, select: false }, // raw OCR output, not exposed by default
-    extractedText: String, // AI-corrected, clean text
+
+    rawOcrText: { type: String, select: false },
+    extractedText: String,
     extractedFields: [fieldSchema],
 
-    // Document intelligence
+
     documentType: {
       type: String,
       enum: [
@@ -57,10 +57,10 @@ const documentSchema = new mongoose.Schema(
       ],
       default: 'other',
     },
-    detectedLanguages: [{ type: String }], // ['hindi', 'english', 'tamil', ...]
+    detectedLanguages: [{ type: String }],
     primaryLanguage: String,
 
-    // Scoring
+
     confidenceScore: { type: Number, min: 0, max: 100, default: 0 },
     healthScore: { type: Number, min: 0, max: 100, default: 0 },
     healthDetails: {
@@ -70,32 +70,32 @@ const documentSchema = new mongoose.Schema(
       suggestions: [String],
     },
 
-    // PII / Masking
+
     hasPII: { type: Boolean, default: false },
-    piiFields: [String], // field keys that contain PII
+    piiFields: [String],
     isPIIMasked: { type: Boolean, default: false },
 
-    // Translation
+
     translations: {
       type: Map,
-      of: String, // { en: '...', hi: '...', ta: '...' }
+      of: String,
     },
 
-    // Layout reconstruction
+
     structuredContent: {
-      type: mongoose.Schema.Types.Mixed, // tables, headings, paragraphs as JSON
+      type: mongoose.Schema.Types.Mixed,
     },
 
-    // File metadata
-    fileSize: Number, // bytes
+
+    fileSize: Number,
     mimeType: String,
     pageCount: { type: Number, default: 1 },
 
-    // Processing metrics
+
     processingTimeMs: Number,
    ocrEngine: { type: String, enum: ['tesseract', 'paddleocr', 'hybrid', 'tesseract+gemini', 'gemini-only'], default: 'tesseract' },
 
-    // Human-in-the-loop
+
     reviewedAt: Date,
     reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     correctionLog: [
@@ -117,7 +117,7 @@ const documentSchema = new mongoose.Schema(
   }
 );
 
-// Text search index
+
 documentSchema.index({
   extractedText: 'text',
   title: 'text',

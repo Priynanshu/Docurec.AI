@@ -1,19 +1,19 @@
-// ─── Document Card Component ──────────────────────────────────────────────────
-// Shows a single document in the grid — with confidence arc, status, languages
+
+
 
 import { motion } from 'framer-motion';
 import { FileText, Shield, AlertTriangle, CheckCircle, Clock, Eye, Trash2, Languages } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '../ui/skeleton';
 
-// Human-readable labels for document types
+
 const TYPE_LABELS = {
   aadhaar: 'Aadhaar', pan: 'PAN', voter_id: 'Voter ID', passport: 'Passport',
   driving_license: 'DL', land_record: 'Land Record', court_notice: 'Court Notice',
   ration_card: 'Ration Card', birth_certificate: 'Birth Cert', other: 'Document',
 };
 
-// Color + icon for each status
+
 const STATUS_CONFIG = {
   completed:    { icon: CheckCircle, color: 'text-success', bg: 'bg-[rgba(34,211,238,0.1)]',  label: 'Done' },
   processing:   { icon: Clock,       color: 'text-sky',     bg: 'bg-sky-muted',               label: 'Processing' },
@@ -22,13 +22,13 @@ const STATUS_CONFIG = {
   needs_review: { icon: AlertTriangle, color: 'text-warning', bg: 'bg-[rgba(245,158,11,0.1)]', label: 'Review' },
 };
 
-// Flag emojis for detected languages
+
 const LANG_FLAGS = {
   hindi: '🇮🇳', english: '🇬🇧', bengali: '🇧🇩',
   tamil: '🇮🇳', telugu: '🇮🇳', marathi: '🇮🇳',
 };
 
-// Circular confidence arc (SVG)
+
 function ConfidenceArc({ score }) {
   const radius = 18;
   const circumference = 2 * Math.PI * radius;
@@ -38,9 +38,9 @@ function ConfidenceArc({ score }) {
   return (
     <div className="relative w-12 h-12 flex items-center justify-center">
       <svg className="w-12 h-12 -rotate-90" viewBox="0 0 44 44">
-        {/* Background circle */}
+        {}
         <circle cx="22" cy="22" r={radius} fill="none" stroke="#2A2A38" strokeWidth="3" />
-        {/* Animated progress circle */}
+        {}
         <motion.circle
           cx="22" cy="22" r={radius}
           fill="none" stroke={color} strokeWidth="3"
@@ -51,13 +51,13 @@ function ConfidenceArc({ score }) {
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
         />
       </svg>
-      {/* Score number in center */}
+      {}
       <span className="absolute text-[10px] font-semibold" style={{ color }}>{score}%</span>
     </div>
   );
 }
 
-// Skeleton loading card (uses shadcn Skeleton)
+
 export function DocumentCardSkeleton() {
   return (
     <div className="card p-4">
@@ -82,7 +82,7 @@ export default function DocumentCard({ doc, onDelete, index = 0 }) {
       className="card p-4 group cursor-pointer hover:border-border-hover transition-all duration-200"
     >
       <Link to={`/documents/${doc._id}`} className="block">
-        {/* Document thumbnail */}
+        {}
         <div className="relative w-full h-36 bg-bg-elevated rounded-lg mb-3 overflow-hidden flex items-center justify-center">
           {doc.imageKit?.url ? (
             <img src={doc.imageKit.url} alt={doc.title} className="w-full h-full object-cover" loading="lazy" />
@@ -90,13 +90,13 @@ export default function DocumentCard({ doc, onDelete, index = 0 }) {
             <FileText className="w-10 h-10 text-text-tertiary" />
           )}
 
-          {/* Status badge */}
+          {}
           <div className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-pill text-[10px] font-medium ${status.bg} ${status.color}`}>
             <StatusIcon className="w-3 h-3" />
             {status.label}
           </div>
 
-          {/* PII warning badge */}
+          {}
           {doc.hasPII && (
             <div className={`absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-pill text-[10px] ${doc.isPIIMasked ? 'bg-[rgba(34,211,238,0.15)] text-success' : 'bg-[rgba(245,158,11,0.15)] text-warning'}`}>
               <Shield className="w-3 h-3" />
@@ -104,7 +104,7 @@ export default function DocumentCard({ doc, onDelete, index = 0 }) {
             </div>
           )}
 
-          {/* Scanning animation for processing docs */}
+          {}
           {doc.status === 'processing' && (
             <div className="absolute inset-0 bg-bg-primary/30">
               <div className="scan-overlay" />
@@ -112,7 +112,7 @@ export default function DocumentCard({ doc, onDelete, index = 0 }) {
           )}
         </div>
 
-        {/* Doc info row */}
+        {}
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-text-primary truncate mb-0.5">
@@ -125,7 +125,7 @@ export default function DocumentCard({ doc, onDelete, index = 0 }) {
           <ConfidenceArc score={doc.confidenceScore || 0} />
         </div>
 
-        {/* Detected languages */}
+        {}
         {doc.detectedLanguages?.length > 0 && (
           <div className="flex items-center gap-1 mt-2 flex-wrap">
             <Languages className="w-3 h-3 text-text-tertiary" />
@@ -138,7 +138,7 @@ export default function DocumentCard({ doc, onDelete, index = 0 }) {
         )}
       </Link>
 
-      {/* Action buttons — show on hover */}
+      {}
       <div className="flex items-center gap-1 mt-3 pt-3 border-t border-border opacity-0 group-hover:opacity-100 transition-opacity">
         <Link to={`/documents/${doc._id}`} className="btn-ghost text-xs flex items-center gap-1 flex-1 justify-center py-1.5">
           <Eye className="w-3.5 h-3.5" /> View

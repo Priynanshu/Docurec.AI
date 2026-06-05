@@ -1,9 +1,4 @@
-// ─── ImageKit Configuration ───────────────────────────────────────────────────
-// ImageKit stores and serves your document images via CDN
-// Get keys from: https://imagekit.io → Dashboard → Developer Options
-
 const ImageKit = require('imagekit');
-const logger = require('../utils/logger');
 
 let imagekitClient = null;
 
@@ -18,7 +13,6 @@ const getImageKit = () => {
   return imagekitClient;
 };
 
-// Check if ImageKit is properly configured
 const isImageKitConfigured = () => {
   return !!(
     process.env.IMAGEKIT_PUBLIC_KEY &&
@@ -28,15 +22,12 @@ const isImageKitConfigured = () => {
   );
 };
 
-// Upload a file buffer to ImageKit
-// Returns { fileId, url, thumbnailUrl } or falls back to a local placeholder
 const uploadToImageKit = async (fileBuffer, fileName, folder = '/docurec') => {
-  // If ImageKit is not configured, use a placeholder (so upload still works in dev)
   if (!isImageKitConfigured()) {
-    logger.warn('ImageKit not configured — using placeholder URL for development');
+    console.warn('ImageKit not configured — using placeholder URL for development');
     return {
       fileId: 'local_' + Date.now(),
-      url: null,           // no real URL
+      url: null,
       thumbnailUrl: null,
       name: fileName,
       size: fileBuffer.length,
@@ -61,8 +52,7 @@ const uploadToImageKit = async (fileBuffer, fileName, folder = '/docurec') => {
       size: result.size,
     };
   } catch (error) {
-    logger.error('ImageKit upload failed: ' + error.message);
-    // Don't crash the upload — return placeholder so doc is still saved
+    console.error(`ImageKit upload failed: ${error.message}`);
     return {
       fileId: 'failed_' + Date.now(),
       url: null,
@@ -74,16 +64,15 @@ const uploadToImageKit = async (fileBuffer, fileName, folder = '/docurec') => {
   }
 };
 
-// Delete a file from ImageKit
 const deleteFromImageKit = async (fileId) => {
   if (!isImageKitConfigured() || fileId.startsWith('local_') || fileId.startsWith('failed_')) {
-    return; // skip for dev placeholders
+    return;
   }
   try {
     const ik = getImageKit();
     await ik.deleteFile(fileId);
   } catch (error) {
-    logger.warn('Could not delete from ImageKit: ' + error.message);
+    console.warn(`Could not delete from ImageKit: ${error.message}`);
   }
 };
 

@@ -1,4 +1,4 @@
-// ─── Home / Landing Page ──────────────────────────────────────────────────────
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
-// ── Reusable animated section wrapper ────────────────────────────────────────
+
 function FadeIn({ children, delay = 0, className = '' }) {
   return (
     <motion.div
@@ -23,7 +23,7 @@ function FadeIn({ children, delay = 0, className = '' }) {
   );
 }
 
-// ── Feature card ──────────────────────────────────────────────────────────────
+
 function FeatureCard({ icon: Icon, title, desc, color, delay }) {
   return (
     <FadeIn delay={delay}>
@@ -43,7 +43,7 @@ function FeatureCard({ icon: Icon, title, desc, color, delay }) {
   );
 }
 
-// ── Stats counter ─────────────────────────────────────────────────────────────
+
 function Stat({ value, label }) {
   return (
     <div className="text-center">
@@ -61,7 +61,7 @@ function Stat({ value, label }) {
   );
 }
 
-// ── How it works step ─────────────────────────────────────────────────────────
+
 function Step({ number, title, desc, delay }) {
   return (
     <FadeIn delay={delay} className="flex gap-4">
@@ -76,7 +76,7 @@ function Step({ number, title, desc, delay }) {
   );
 }
 
-// ── Testimonial card ──────────────────────────────────────────────────────────
+
 function Testimonial({ name, role, text, delay }) {
   return (
     <FadeIn delay={delay}>
@@ -96,7 +96,7 @@ function Testimonial({ name, role, text, delay }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 export default function Home() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
@@ -164,7 +164,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-bg-primary overflow-x-hidden">
 
-      {/* ── Navbar ── */}
+      {}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-bg-primary/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -197,18 +197,18 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ── Hero Section ── */}
+      {}
       <section className="pt-32 pb-20 px-4 sm:px-6 relative overflow-hidden">
-        {/* Subtle dot grid */}
+        {}
         <div className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: 'radial-gradient(#38BDF8 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-        {/* Glowing orb */}
+        {}
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-[0.06]"
           style={{ background: '#38BDF8', filter: 'blur(80px)' }} />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          {/* Badge */}
+          {}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -219,7 +219,7 @@ export default function Home() {
             <span className="text-sky text-xs font-medium">Powered by Google Gemini AI</span>
           </motion.div>
 
-          {/* Headline */}
+          {}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -241,7 +241,7 @@ export default function Home() {
             AI extracts, structures, and makes them searchable in seconds.
           </motion.p>
 
-          {/* CTA buttons */}
+          {}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -260,7 +260,7 @@ export default function Home() {
             </Link>
           </motion.div>
 
-          {/* Trust badges */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -276,7 +276,7 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Hero demo card */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -284,7 +284,7 @@ export default function Home() {
           className="max-w-3xl mx-auto mt-16 relative"
         >
           <div className="card p-1 overflow-hidden">
-            {/* Fake browser bar */}
+            {}
             <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-border">
               <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
               <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
@@ -294,13 +294,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Demo content */}
+            {}
             <div className="grid grid-cols-2 gap-0 min-h-48">
-              {/* Left: document image placeholder */}
+              {}
               <div className="bg-bg-elevated border-r border-border p-4 flex flex-col items-center justify-center gap-3">
                 <div className="w-full h-28 bg-bg-primary rounded-lg border border-border flex items-center justify-center relative overflow-hidden">
                   <FileText className="w-10 h-10 text-text-tertiary/40" />
-                  {/* Scan line animation */}
+                  {}
                   <motion.div
                     className="absolute left-0 right-0 h-0.5 bg-sky/60"
                     style={{ boxShadow: '0 0 8px #38BDF8' }}
@@ -311,7 +311,7 @@ export default function Home() {
                 <p className="text-text-tertiary text-[10px]">Aadhaar_scan.jpg</p>
               </div>
 
-              {/* Right: extracted fields */}
+              {}
               <div className="p-4 space-y-2">
                 <p className="text-[10px] font-semibold text-sky mb-3 uppercase tracking-wide">Extracted Fields</p>
                 {[
@@ -336,7 +336,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ── Stats ── */}
+      {}
       <section className="py-16 px-4 border-y border-border">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-8">
           <Stat value="12+" label="Indian Languages" />
@@ -346,7 +346,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Features ── */}
+      {}
       <section id="features" className="py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-14">
@@ -365,7 +365,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── How it Works ── */}
+      {}
       <section id="how-it-works" className="py-20 px-4 sm:px-6 bg-bg-secondary">
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-14">
@@ -392,7 +392,7 @@ export default function Home() {
                 desc="Your document is now structured intelligence — searchable, translatable, comparable, and ready for AI chat or export as JSON/CSV." />
             </div>
 
-            {/* Step visual */}
+            {}
             <FadeIn delay={0.2} className="hidden md:block">
               <div className="card p-6 space-y-3 sticky top-24">
                 <div className="flex items-center gap-3 p-3 bg-bg-elevated rounded-lg border border-border">
@@ -434,7 +434,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
+      {}
       <section id="testimonials" className="py-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-14">
@@ -449,7 +449,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Document Types ── */}
+      {}
       <section className="py-16 px-4 border-y border-border bg-bg-secondary">
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-10">
@@ -471,7 +471,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA Section ── */}
+      {}
       <section className="py-24 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full opacity-[0.05]"
           style={{ background: '#38BDF8', filter: 'blur(60px)' }} />
@@ -493,7 +493,7 @@ export default function Home() {
         </FadeIn>
       </section>
 
-      {/* ── Footer ── */}
+      {}
       <footer className="border-t border-border py-8 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">

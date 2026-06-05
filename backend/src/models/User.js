@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Password is required'],
       minlength: 8,
-      select: false, // never returned in queries by default
+      select: false,
     },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     avatar: { type: String, default: null },
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
     stats: {
       totalDocuments: { type: Number, default: 0 },
       totalProcessed: { type: Number, default: 0 },
-      storageUsed:    { type: Number, default: 0 }, // bytes
+      storageUsed:    { type: Number, default: 0 },
     },
     lastLoginAt: { type: Date },
   },
@@ -43,14 +43,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
+
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// Check if entered password matches stored hash
+
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };

@@ -75,7 +75,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
+      {}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -95,7 +95,7 @@ export default function Dashboard() {
         </Link>
       </motion.div>
 
-      {/* Stats Grid */}
+      {}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <AnimatedStat label="Total Documents" value={analytics?.overview?.total ?? '—'} icon={FileText} color="#38BDF8" delay={0} />
         <AnimatedStat label="Processed" value={analytics?.overview?.completed ?? '—'} icon={CheckCircle} color="#22D3EE" delay={0.05} />
@@ -103,9 +103,9 @@ export default function Dashboard() {
         <AnimatedStat label="Needs Review" value={analytics?.overview?.needsReview ?? '—'} icon={AlertTriangle} color="#F59E0B" delay={0.15} />
       </div>
 
-      {/* Charts row */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Activity */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -134,7 +134,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Doc type distribution */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -171,7 +171,7 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Quick actions */}
+      {}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -198,7 +198,7 @@ export default function Dashboard() {
         ))}
       </motion.div>
 
-      {/* Recent Documents */}
+      {}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-text-primary">Recent Documents</h2>

@@ -52,7 +52,7 @@ export default function Documents() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-5">
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-text-primary">Document Library</h1>
@@ -65,7 +65,7 @@ export default function Documents() {
         </Link>
       </div>
 
-      {/* Search + filters */}
+      {}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
@@ -108,7 +108,7 @@ export default function Documents() {
         </div>
       </div>
 
-      {/* Documents grid */}
+      {}
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
           {Array.from({ length: 12 }).map((_, i) => (
@@ -171,7 +171,7 @@ export default function Documents() {
         </motion.div>
       )}
 
-      {/* Pagination */}
+      {}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2">
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40">← Prev</button>

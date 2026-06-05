@@ -1,4 +1,4 @@
-// ─── Sidebar Navigation ───────────────────────────────────────────────────────
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FileText, Upload, MessageSquare, GitCompare, BarChart3, Settings, LogOut, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
@@ -35,7 +35,7 @@ export default function Sidebar() {
       transition={{ duration: 0.2, ease: 'easeInOut' }}
       className="fixed top-0 left-0 h-full bg-bg-primary border-r border-border flex flex-col z-30 overflow-hidden"
     >
-      {/* Logo */}
+      {}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-border flex-shrink-0">
         <div className="w-8 h-8 rounded-lg bg-sky-muted border border-sky/30 flex items-center justify-center flex-shrink-0">
           <Zap className="w-4 h-4 text-sky" />
@@ -54,7 +54,7 @@ export default function Sidebar() {
         </AnimatePresence>
       </div>
 
-      {/* Nav Links */}
+      {}
       <nav className="flex-1 py-4 px-2 space-y-0.5 overflow-y-auto">
         {navItems.map(({ icon: Icon, label, path }) => {
           const active = isActive(path);
@@ -78,7 +78,7 @@ export default function Sidebar() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-                {/* Tooltip when collapsed */}
+                {}
                 {collapsed && (
                   <div className="absolute left-full ml-2 bg-bg-elevated border border-border text-text-primary text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
                     {label}
@@ -90,7 +90,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom: Settings + Logout + Collapse */}
+      {}
       <div className="py-4 px-2 border-t border-border space-y-0.5">
         <Link to="/settings">
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-btn text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors">

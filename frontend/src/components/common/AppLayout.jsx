@@ -14,12 +14,12 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="flex h-screen bg-bg-primary overflow-hidden">
-      {/* Desktop Sidebar */}
+      {}
       <div className="hidden md:block">
         <Sidebar />
       </div>
 
-      {/* Main content area - shifts right to make room for sidebar */}
+      {}
       <motion.main
         animate={{ marginLeft: collapsed ? 64 : 240 }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
@@ -37,7 +37,7 @@ export default function AppLayout({ children }) {
         </motion.div>
       </motion.main>
 
-      {/* Mobile layout — full screen + bottom nav */}
+      {}
       <div className="flex flex-col flex-1 md:hidden overflow-hidden">
         <motion.div
           variants={pageVariants}
