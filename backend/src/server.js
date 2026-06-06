@@ -13,7 +13,7 @@ const startServer = async () => {
     connectRedis();
 
     server = app.listen(PORT, () => {
-      console.log(`🚀 DocuRec AI Server running on port ${PORT} [${process.env.NODE_ENV}]`);
+      console.log(`DocuRec AI Server running on port ${PORT} [${process.env.NODE_ENV}]`);
     });
 
     server.timeout = 120000;
