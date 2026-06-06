@@ -20,16 +20,18 @@ const runTesseract = async (imageBuffer) => {
 
 const processWithGemini = async (rawOcrText) => {
   const prompt = `
-You are an expert OCR correction AI specializing in Indian government documents (Aadhaar, PAN card, land records, court notices, voter ID, ration card, certificates, etc).
+You are an expert OCR correction AI specializing in Indian government documents (Aadhaar, PAN card, land records, Application, court notices, voter ID, ration card, certificates, etc).
 
 I will give you raw OCR text that was extracted from a scanned document. The text may be:
-- Blurry or low resolution
+- Very Blurry, Very Small, Crumpled or low resolution
 - Partially garbled with wrong characters
 - Mixed Hindi/English
 - Have broken words or extra spaces
 
 YOUR TASKS:
-1. Even if the text is blurry or partially garbled — DO YOUR BEST to extract whatever information is visible. Never give up.
+Act as a high-powered OCR system. If the text or sections of the image are small, faint, or hard to read, digitally zoom in and enhance your focus on those specific areas to extract maximum detail.
+
+1. Even if the text is Very blurry, Very Small Crumpled or partially garbled — DO YOUR BEST to extract whatever information is visible. Never give up.
 2. Fix OCR errors using your knowledge of Indian document formats
 3. Detect languages used (hindi, english, tamil, telugu, marathi, gujarati, kannada, bengali, punjabi, etc)
 4. Identify document type

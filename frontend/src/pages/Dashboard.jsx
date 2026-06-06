@@ -83,7 +83,7 @@ export default function Dashboard() {
       >
         <div>
           <h1 className="text-xl font-semibold text-text-primary">
-            Welcome back, {user?.name?.split(' ')[0]} 👋
+            Welcome back, {user?.name?.split(' ')[0]}
           </h1>
           <p className="text-text-tertiary text-sm mt-0.5">
             Your document intelligence hub
