@@ -46,7 +46,7 @@ function FileItem({ file, status, progress }) {
   );
 }
 
-export default function UploadZone({ onSuccess, batch = false }) {
+export default function UploadZone({ onSuccess, batch = false, citizenId = null }) {
   const [files, setFiles] = useState([]);
   const [fileStatuses, setFileStatuses] = useState({});
   const [isUploading, setIsUploading] = useState(false);
@@ -78,6 +78,7 @@ export default function UploadZone({ onSuccess, batch = false }) {
       if (batch && files.length > 1) {
         const formData = new FormData();
         files.forEach((f) => formData.append('documents', f));
+        if (citizenId) formData.append('citizenId', citizenId);
         await documentAPI.batchUpload(formData, (e) => {
           const pct = Math.round((e.loaded / e.total) * 100);
           files.forEach((_, i) => {
@@ -89,6 +90,7 @@ export default function UploadZone({ onSuccess, batch = false }) {
         for (let i = 0; i < files.length; i++) {
           const formData = new FormData();
           formData.append('document', files[i]);
+          if (citizenId) formData.append('citizenId', citizenId);
           setFileStatuses((p) => ({ ...p, [i]: { status: 'uploading', progress: 0 } }));
           try {
             await documentAPI.upload(formData, (e) => {
@@ -105,6 +107,11 @@ export default function UploadZone({ onSuccess, batch = false }) {
       toast.success(`${files.length} document(s) uploaded and queued for processing`);
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
+      if (citizenId) {
+        queryClient.invalidateQueries({ queryKey: ['citizen', citizenId] });
+        queryClient.invalidateQueries({ queryKey: ['citizens'] });
+        queryClient.invalidateQueries({ queryKey: ['citizenDocuments', citizenId] });
+      }
 
       setTimeout(() => {
         setFiles([]);

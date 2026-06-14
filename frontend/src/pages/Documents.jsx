@@ -20,13 +20,21 @@ export default function Documents() {
   const [language, setLanguage] = useState('');
   const [page, setPage] = useState(1);
   const [view, setView] = useState('grid');
+  // When true, only show documents NOT assigned to any citizen
+  // (i.e. the operator's own personal documents)
+  const [myDocsOnly, setMyDocsOnly] = useState(false);
 
   const debouncedSearch = useDebounce(search, 400);
   const qc = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['documents', { page, status, type, language, search: debouncedSearch }],
-    queryFn: () => documentAPI.getAll({ page, limit: 12, status: status || undefined, type: type || undefined, language: language || undefined, search: debouncedSearch || undefined }),
+    queryKey: ['documents', { page, status, type, language, search: debouncedSearch, myDocsOnly }],
+    queryFn: () => documentAPI.getAll({
+      page, limit: 12,
+      status: status || undefined, type: type || undefined, language: language || undefined,
+      search: debouncedSearch || undefined,
+      unassignedOnly: myDocsOnly ? true : undefined,
+    }),
     staleTime: 30000,
     keepPreviousData: true,
   });
@@ -45,8 +53,8 @@ export default function Documents() {
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages || 1;
 
-  const clearFilters = () => { setSearch(''); setStatus(''); setType(''); setLanguage(''); setPage(1); };
-  const hasFilters = search || status || type || language;
+  const clearFilters = () => { setSearch(''); setStatus(''); setType(''); setLanguage(''); setMyDocsOnly(false); setPage(1); };
+  const hasFilters = search || status || type || language || myDocsOnly;
 
   const selectStyle = "input text-xs py-1.5 cursor-pointer";
 
@@ -76,6 +84,19 @@ export default function Documents() {
             placeholder="Search documents…"
           />
         </div>
+
+        {/* Toggle: show only my own documents (not assigned to a citizen) */}
+        <button
+          onClick={() => { setMyDocsOnly((v) => !v); setPage(1); }}
+          className={`text-xs px-3 py-1.5 rounded-btn border transition-colors whitespace-nowrap ${
+            myDocsOnly
+              ? 'border-sky/40 bg-sky-muted text-sky'
+              : 'border-border text-text-secondary hover:border-border-hover'
+          }`}
+          title="Show only documents not assigned to a citizen"
+        >
+          My Documents Only
+        </button>
 
         <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className={selectStyle}>
           <option value="">All Status</option>

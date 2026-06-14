@@ -20,6 +20,8 @@ import DocumentDetail from './pages/DocumentDetail';
 import Upload from './pages/Upload';
 import Chat from './pages/Chat';
 import Compare from './pages/Compare';
+import Citizens from './pages/Citizens';
+import CitizenDetail from './pages/CitizenDetail';
 
 
 const queryClient = new QueryClient({
@@ -54,17 +56,19 @@ function AppRoutes() {
         <Routes>
           {}
           <Route path="/" element={<Home />} />
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/register" element={<Register />} />
+          <Route path="/auth/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/auth/register" element={<PublicRoute><Register /></PublicRoute>} />
 
           {}
-          <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
-          <Route path="/documents" element={<AppLayout><Documents /></AppLayout>} />
-          <Route path="/documents/:id" element={<AppLayout><DocumentDetail /></AppLayout>} />
-          <Route path="/documents/:id/chat" element={<AppLayout><Chat /></AppLayout>} />
-          <Route path="/upload" element={<AppLayout><Upload /></AppLayout>} />
-          <Route path="/chat" element={<AppLayout><Chat /></AppLayout>} />
-          <Route path="/compare" element={<AppLayout><Compare /></AppLayout>} />
+          <Route path="/dashboard" element={<PrivateRoute><AppLayout><Dashboard /></AppLayout></PrivateRoute>} />
+          <Route path="/documents" element={<PrivateRoute><AppLayout><Documents /></AppLayout></PrivateRoute>} />
+          <Route path="/documents/:id" element={<PrivateRoute><AppLayout><DocumentDetail /></AppLayout></PrivateRoute>} />
+          <Route path="/documents/:id/chat" element={<PrivateRoute><AppLayout><Chat /></AppLayout></PrivateRoute>} />
+          <Route path="/upload" element={<PrivateRoute><AppLayout><Upload /></AppLayout></PrivateRoute>} />
+          <Route path="/chat" element={<PrivateRoute><AppLayout><Chat /></AppLayout></PrivateRoute>} />
+          <Route path="/compare" element={<PrivateRoute><AppLayout><Compare /></AppLayout></PrivateRoute>} />
+          <Route path="/citizens" element={<PrivateRoute><AppLayout><Citizens /></AppLayout></PrivateRoute>} />
+          <Route path="/citizens/:id" element={<PrivateRoute><AppLayout><CitizenDetail /></AppLayout></PrivateRoute>} />
 
           {}
           <Route path="*" element={<Navigate to="/" replace />} />

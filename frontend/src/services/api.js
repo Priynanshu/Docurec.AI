@@ -6,7 +6,7 @@ import axios from 'axios';
 import store from '../store/index';
 import { logout } from '../store/authSlice';
 
-const BASE_URL = `${import.meta.env.VITE_API_URL}/api/v1` || 'http://localhost:5000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 
 const api = axios.create({
@@ -96,6 +96,17 @@ export const userAPI = {
   getProfile:     ()     => api.get('/users/profile'),
   updateProfile:  (data) => api.patch('/users/profile', data),
   changePassword: (data) => api.patch('/users/password', data),
+};
+
+
+// Citizens API — manage citizens (clients) under a CSC operator account
+export const citizenAPI = {
+  getAll:       (params) => api.get('/citizens', { params }),
+  getById:      (id)     => api.get(`/citizens/${id}`),
+  create:       (data)   => api.post('/citizens', data),
+  update:       (id, data) => api.patch(`/citizens/${id}`, data),
+  delete:       (id)     => api.delete(`/citizens/${id}`),
+  getDocuments: (id, params) => api.get(`/citizens/${id}/documents`, { params }),
 };
 
 export default api;

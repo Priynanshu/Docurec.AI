@@ -1,12 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Upload, MessageSquare, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, FileText, Upload, MessageSquare, Users } from 'lucide-react';
 
 const items = [
   { icon: LayoutDashboard, label: 'Home', path: '/dashboard' },
   { icon: FileText, label: 'Docs', path: '/documents' },
   { icon: Upload, label: 'Upload', path: '/upload' },
   { icon: MessageSquare, label: 'Chat', path: '/chat' },
-  { icon: BarChart3, label: 'Stats', path: '/analytics' },
+  { icon: Users, label: 'Citizens', path: '/citizens' },
 ];
 
 export default function MobileNav() {

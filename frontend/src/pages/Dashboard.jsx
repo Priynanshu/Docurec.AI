@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   FileText, CheckCircle, AlertTriangle, Zap, TrendingUp,
-  Upload, MessageSquare, ArrowRight, Languages
+  Upload, MessageSquare, ArrowRight, Languages, Users
 } from 'lucide-react';
 import { documentAPI } from '../services/api';
 import { useSelector } from 'react-redux';
@@ -176,10 +176,11 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+        className="grid grid-cols-2 sm:grid-cols-4 gap-3"
       >
         {[
           { icon: Upload, label: 'Upload Document', desc: 'Add new files for processing', path: '/upload', color: '#38BDF8' },
+          { icon: Users, label: 'Manage Citizens', desc: 'Organize documents by citizen', path: '/citizens', color: '#F59E0B' },
           { icon: MessageSquare, label: 'Ask AI', desc: 'Chat about your documents', path: '/chat', color: '#22D3EE' },
           { icon: FileText, label: 'Browse Library', desc: 'Search all documents', path: '/documents', color: '#0EA5E9' },
         ].map(({ icon: Icon, label, desc, path, color }) => (

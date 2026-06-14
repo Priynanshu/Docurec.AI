@@ -12,6 +12,7 @@ const authRoutes = require('./routes/auth');
 const documentRoutes = require('./routes/documents');
 const chatRoutes = require('./routes/chat');
 const userRoutes = require('./routes/users');
+const citizenRoutes = require('./routes/citizens');
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/documents', documentRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/citizens', citizenRoutes);
 
 
 app.use(notFoundHandler);

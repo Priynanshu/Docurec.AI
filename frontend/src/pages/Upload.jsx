@@ -1,12 +1,24 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload as UploadIcon, Layers } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Upload as UploadIcon, Layers, User } from 'lucide-react';
 import UploadZone from '../components/features/UploadZone';
+import { citizenAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 export default function Upload() {
   const [mode, setMode] = useState('single');
+  // Optional: which citizen's folder to upload into. Empty = operator's own docs.
+  const [citizenId, setCitizenId] = useState('');
   const navigate = useNavigate();
+
+  // Load citizens list for the dropdown (lightweight, cached)
+  const { data: citizensData } = useQuery({
+    queryKey: ['citizens', { page: 1, forUpload: true }],
+    queryFn: () => citizenAPI.getAll({ page: 1, limit: 100 }),
+    staleTime: 60000,
+  });
+  const citizens = citizensData?.data || [];
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -33,6 +45,27 @@ export default function Upload() {
         ))}
       </div>
 
+      {/* Citizen selector — choose whose folder this upload goes into */}
+      <div className="card p-4">
+        <label className="text-xs font-medium text-text-secondary mb-2 flex items-center gap-1.5">
+          <User className="w-3.5 h-3.5 text-sky" /> Upload for
+        </label>
+        <select
+          value={citizenId}
+          onChange={(e) => setCitizenId(e.target.value)}
+          className="input text-sm"
+        >
+          <option value="">My Documents (not assigned to a citizen)</option>
+          {citizens.map((c) => (
+            <option key={c._id} value={c._id}>{c.name}{c.village ? ` — ${c.village}` : ''}</option>
+          ))}
+        </select>
+        <p className="text-[10px] text-text-tertiary mt-1.5">
+          Managing documents for villagers? Select their name here, or{' '}
+          <a href="/citizens" className="text-sky hover:underline">add a new citizen</a>.
+        </p>
+      </div>
+
       <motion.div
         key={mode}
         initial={{ opacity: 0, y: 10 }}
@@ -40,7 +73,11 @@ export default function Upload() {
         transition={{ duration: 0.2 }}
         className="card p-6"
       >
-        <UploadZone batch={mode === 'batch'} onSuccess={() => setTimeout(() => navigate('/documents'), 800)} />
+        <UploadZone
+          batch={mode === 'batch'}
+          citizenId={citizenId || null}
+          onSuccess={() => setTimeout(() => navigate(citizenId ? `/citizens/${citizenId}` : '/documents'), 800)}
+        />
       </motion.div>
 
       {}

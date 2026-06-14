@@ -16,12 +16,17 @@ const upload = async (req, res, next) => {
   try {
     if (!req.file) throw new ApiError(400, 'No file uploaded');
 
+    // citizenId is optional - sent from the upload form when an operator
+    // is uploading on behalf of a specific citizen
+    const { citizenId } = req.body;
+
     const doc = await createDocument(
       req.user._id,
       req.file.buffer,
       req.file.originalname,
       req.file.mimetype,
-      req.file.size
+      req.file.size,
+      citizenId || null
     );
 
     processDocumentById(doc._id.toString(), req.file.buffer).catch(() => {});
@@ -36,6 +41,8 @@ const batchUpload = async (req, res, next) => {
   try {
     if (!req.files || !req.files.length) throw new ApiError(400, 'No files uploaded');
 
+    const { citizenId } = req.body;
+
     const results = await Promise.allSettled(
       req.files.map(async (file) => {
         const doc = await createDocument(
@@ -43,7 +50,8 @@ const batchUpload = async (req, res, next) => {
           file.buffer,
           file.originalname,
           file.mimetype,
-          file.size
+          file.size,
+          citizenId || null
         );
         processDocumentById(doc._id.toString(), file.buffer).catch(() => {});
         return doc;
@@ -66,10 +74,10 @@ const batchUpload = async (req, res, next) => {
 
 const getDocuments = async (req, res, next) => {
   try {
-    const { page = 1, limit = 12, status, type, language, search, sort } = req.query;
+    const { page = 1, limit = 12, status, type, language, search, sort, citizenId, unassignedOnly } = req.query;
     const result = await getUserDocuments(req.user._id, {
       page: parseInt(page), limit: parseInt(limit),
-      status, type, language, search, sort,
+      status, type, language, search, sort, citizenId, unassignedOnly,
     });
     return sendPaginated(res, result.docs, result.total, page, limit);
   } catch (error) {

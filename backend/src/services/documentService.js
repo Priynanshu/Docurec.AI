@@ -6,11 +6,12 @@ const { cacheGet, cacheSet, cacheDel, cacheDelPattern } = require('../config/red
 const ApiError = require('../utils/ApiError');
 const mongoose = require('mongoose');
 
-const createDocument = async (userId, fileBuffer, originalName, mimeType, fileSize) => {
+const createDocument = async (userId, fileBuffer, originalName, mimeType, fileSize, citizenId = null) => {
   const ikResult = await uploadToImageKit(fileBuffer, originalName, `/docurec/${userId}`);
 
   const doc = await Document.create({
     userId,
+    citizenId: citizenId || null, // optional - links this doc to a citizen's folder
     originalFileName: originalName,
     title: originalName.replace(/\.[^.]+$/, ''),
     imageKit: {
@@ -29,6 +30,13 @@ const createDocument = async (userId, fileBuffer, originalName, mimeType, fileSi
   });
 
   await cacheDelPattern(`docs:${userId}:*`);
+
+  // If this document belongs to a citizen, refresh that citizen's doc count
+  if (citizenId) {
+    const { refreshCitizenDocumentCount } = require('./citizenService');
+    await refreshCitizenDocumentCount(citizenId);
+    await cacheDelPattern(`citizens:${userId}:*`);
+  }
 
   return doc;
 };
@@ -88,7 +96,7 @@ const processDocumentById = async (documentId, fileBuffer) => {
 };
 
 const getUserDocuments = async (userId, options = {}) => {
-  const { page = 1, limit = 12, status, type, language, search, sort = '-createdAt' } = options;
+  const { page = 1, limit = 12, status, type, language, search, sort = '-createdAt', citizenId, unassignedOnly } = options;
 
   const cacheKey = `docs:${userId}:${JSON.stringify(options)}`;
   const cached = await cacheGet(cacheKey);
@@ -96,6 +104,17 @@ const getUserDocuments = async (userId, options = {}) => {
 
   const query = { userId, isDeleted: false };
   if (status) query.status = status;
+  if (type) query.documentType = type;
+  if (language) query.detectedLanguages = language;
+
+  // Filter by a specific citizen's folder, or show only documents
+  // that are NOT assigned to any citizen ("My Documents" view)
+  if (citizenId) {
+    query.citizenId = citizenId;
+  } else if (unassignedOnly === 'true' || unassignedOnly === true) {
+    query.citizenId = null;
+  }
+
   if (type) query.documentType = type;
   if (language) query.detectedLanguages = language;
   if (search) {
@@ -194,6 +213,13 @@ const deleteDocument = async (documentId, userId) => {
   await cacheDel(`doc:${documentId}`);
   await cacheDelPattern(`docs:${userId}:*`);
   await cacheDelPattern(`analytics:${userId}`);
+
+  // If this document belonged to a citizen, refresh their document count
+  if (doc.citizenId) {
+    const { refreshCitizenDocumentCount } = require('./citizenService');
+    await refreshCitizenDocumentCount(doc.citizenId);
+    await cacheDelPattern(`citizens:${userId}:*`);
+  }
 };
 
 const getUserAnalytics = async (userId) => {

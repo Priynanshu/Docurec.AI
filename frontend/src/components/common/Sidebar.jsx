@@ -1,7 +1,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Upload, MessageSquare, GitCompare, BarChart3, Settings, LogOut, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
+import { LayoutDashboard, FileText, Upload, MessageSquare, GitCompare, BarChart3, Settings, LogOut, ChevronLeft, ChevronRight, Zap, Users } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleSidebar } from '../../store/uiSlice';
 import { logout } from '../../store/authSlice';
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   { icon: FileText, label: 'Documents', path: '/documents' },
+  { icon: Users, label: 'Citizens', path: '/citizens' },
   { icon: Upload, label: 'Upload', path: '/upload' },
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
   { icon: GitCompare, label: 'Compare', path: '/compare' },
@@ -92,12 +93,6 @@ export default function Sidebar() {
 
       {}
       <div className="py-4 px-2 border-t border-border space-y-0.5">
-        <Link to="/settings">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-btn text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors">
-            <Settings className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && <span className="text-sm">Settings</span>}
-          </div>
-        </Link>
 
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-btn text-text-secondary hover:text-error hover:bg-[rgba(248,113,113,0.1)] transition-colors">
           <LogOut className="w-4 h-4 flex-shrink-0" />

@@ -20,6 +20,17 @@ const documentSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+
+    // OPTIONAL: if this document belongs to a citizen managed by a CSC
+    // operator, this links to that Citizen record. If null, the document
+    // belongs directly to the operator/user (existing behaviour — unchanged).
+    citizenId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Citizen',
+      default: null,
+      index: true,
+    },
+
     title: { type: String, trim: true },
     originalFileName: { type: String, required: true },
 
@@ -126,5 +137,6 @@ documentSchema.index({
 documentSchema.index({ userId: 1, createdAt: -1 });
 documentSchema.index({ userId: 1, documentType: 1 });
 documentSchema.index({ userId: 1, status: 1 });
+documentSchema.index({ citizenId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Document', documentSchema);
