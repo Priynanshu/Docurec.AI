@@ -23,8 +23,9 @@ India processes **crores of paper documents daily** — Aadhaar cards, PAN cards
 - In multiple Indian languages (Hindi, Tamil, Telugu, Bengali, and more)
 - Impossible to search, compare, or extract data from at scale
 - Full of private information (PII) that needs protection before sharing
+- Managed by **CSC (Common Service Centre) operators** who handle documents for hundreds of different villagers — not just their own
 
-**DocuRec AI solves this end-to-end** — from upload to structured intelligence.
+**DocuRec AI solves this end-to-end** — from upload to structured intelligence, for individuals and operators managing many people's documents.
 
 ---
 
@@ -37,13 +38,25 @@ Upload a document image → our 2-stage AI pipeline kicks in:
 
 The result: a fully structured document with extracted fields, a confidence score, a health score, and full-text search — all stored securely and queryable via AI chat.
 
+On top of this, an operator can organize documents under **Citizens** — separate folders for each person they serve — so one account scales from "my own documents" to "100 villagers' documents."
+
 ---
 
 ## Key Features
 
+### 👥 Multi-User Citizen Management (for CSC Operators)
+- Add **Citizens** (villagers/clients) under your operator account — name, phone, village, district, state, notes
+- Each citizen gets their own document folder, completely separate from your personal documents
+- Upload documents directly into a citizen's folder, or pick a citizen from a dropdown on the main Upload page
+- **"My Documents Only"** toggle on the Documents page — instantly separate your own files from citizen-assigned ones
+- Citizen profile page with inline-editable fields and live document count
+- Search citizens by name, phone, village, or district
+- Deleting a citizen never deletes their documents — documents simply become unassigned, protecting against accidental data loss
+
 ### 📤 Smart Document Ingestion
 - Drag-and-drop or batch upload (JPEG, PNG, TIFF, PDF)
 - Single file or up to 50 documents at once with per-document progress tracking
+- Optionally tag any upload with a `citizenId` to file it under that person's folder
 - Stored on **ImageKit CDN** with automatic thumbnail generation
 
 ### 🤖 2-Stage AI OCR Pipeline
@@ -56,12 +69,14 @@ The result: a fully structured document with extracted fields, a confidence scor
 - All extracted fields displayed with individual confidence levels
 - Inline field correction — click any field to edit, correction logged with timestamp
 - Full extracted text view — the AI-cleaned, human-readable version
+- Real-time status updates (`queued → processing → completed`) via polling — no manual refresh needed
 
 ### 💬 AI Chat (RAG)
 - Ask questions about a single document or your entire library
 - Powered by **LangChain + Gemini** with full conversation history
 - AI cites which document each answer came from
 - Works in Hindi and English — responds in whichever language you use
+- Chat sessions persist across navigation — switching pages or reloading won't lose your conversation
 
 ### 🛡️ PII Anonymizer
 - Auto-detects Aadhaar numbers, PAN, phone numbers, DOB, addresses
@@ -79,6 +94,7 @@ The result: a fully structured document with extracted fields, a confidence scor
 ### 🔍 Full-Text Search
 - MongoDB text index across all documents, extracted text, and field values
 - Falls back to most-recent documents if text search returns no results
+- Citizen search across name, phone, village, and district
 
 ### 📈 Analytics Panel
 - Total documents, processed count, avg confidence, languages breakdown
@@ -112,7 +128,8 @@ The result: a fully structured document with extracted fields, a confidence scor
 ┌─────────────────────────────────────────────────────────────────┐
 │                        FRONTEND (React 18)                      │
 │  Redux (auth token) → Axios interceptor → All API calls         │
-│  Pages: Home, Dashboard, Documents, Upload, Chat, Compare       │
+│  Pages: Home, Dashboard, Documents, Upload, Chat, Compare,      │
+│         Citizens, CitizenDetail                                 │
 │  Components: DocumentCard, UploadZone, Skeleton, AppLayout      │
 └────────────────────────┬────────────────────────────────────────┘
                          │ HTTPS  /api/v1/*
@@ -128,20 +145,24 @@ The result: a fully structured document with extracted fields, a confidence scor
 │  │  login      │  │  batch      │  │  messages    │           │
 │  │  logout     │  │  mask-pii   │  │  (RAG)       │           │
 │  │  /me        │  │  compare    │  └──────────────┘           │
-│  └─────────────┘  │  translate  │                              │
-│                   │  analytics  │                              │
-│                   └─────────────┘                              │
+│  └─────────────┘  │  translate  │  ┌──────────────┐           │
+│                   │  analytics  │  │  /citizens   │           │
+│                   └─────────────┘  │  CRUD        │           │
+│                                     │  documents   │           │
+│                                     └──────────────┘           │
 │                                                                 │
 │  Services:                                                      │
 │  documentService → ocrService (Tesseract → Gemini) → Document  │
 │  aiService (chat, translate, compare) → ChatSession            │
+│  citizenService (CRUD, document linking, doc count refresh)    │
 └────────────┬───────────────┬────────────────┬───────────────────┘
              │               │                │
         ┌────▼────┐    ┌─────▼────┐    ┌──────▼──────┐
         │ MongoDB │    │  Redis   │    │  ImageKit   │
         │ (docs,  │    │ (cache,  │    │  (CDN file  │
         │ users,  │    │  queues) │    │   storage)  │
-        │ chats)  │    └──────────┘    └─────────────┘
+        │ chats,  │    └──────────┘    └─────────────┘
+        │ citizens)│
         └─────────┘
              │ LangChain calls
         ┌────▼────────────────┐
@@ -170,29 +191,33 @@ Docurec.ai/
 │       ├── controllers/
 │       │   ├── authController.js      ← register, login, logout, getMe
 │       │   ├── documentController.js  ← upload, batchUpload, getDocuments, maskPII, compare, translate, analytics
-│       │   └── chatController.js      ← createSession, getSessions, sendMessage, deleteSession
+│       │   ├── chatController.js      ← createSession, getSessions, sendMessage, deleteSession
+│       │   └── citizenController.js   ← create, getAll, getOne, update, remove, getDocuments
 │       ├── middleware/
 │       │   ├── auth.js          ← JWT authenticate + generateToken
 │       │   ├── errorHandler.js  ← Global error + 404 handlers
-│       │   ├── rateLimiter.js   ← auth (10/15min), upload (10/min), chat (20/min)
+│       │   ├── rateLimiter.js   ← auth (10/15min), upload (10/min), chat (20/min), api (100/15min)
 │       │   ├── upload.js        ← Multer (single + batch, memory storage)
 │       │   └── validators.js    ← express-validator rules + validate() helper
 │       ├── models/
 │       │   ├── User.js          ← name, email, password (hashed), role, stats, lastLoginAt
-│       │   ├── Document.js      ← full document schema with fieldSchema (isPII, isMasked)
+│       │   ├── Document.js      ← full document schema with fieldSchema (isPII, isMasked) + optional citizenId
+│       │   ├── Citizen.js       ← name, phone, village, district, state, notes, documentCount
 │       │   └── ChatSession.js   ← messages[], documentId, isGlobal, lastMessageAt
 │       ├── routes/
 │       │   ├── auth.js          ← POST /register, /login, /logout · GET /me
 │       │   ├── documents.js     ← CRUD + upload, mask, correct, translate, compare, analytics
 │       │   ├── chat.js          ← session CRUD + POST /sessions/:id/message
-│       │   └── users.js         ← GET/PATCH profile, PATCH password
+│       │   ├── users.js         ← GET/PATCH profile, PATCH password
+│       │   └── citizens.js      ← CRUD + GET /:id/documents
 │       ├── services/
 │       │   ├── ocrService.js    ← runTesseract() → processWithGemini() → processDocument()
 │       │   ├── documentService.js ← createDocument, processDocumentById, maskPIIFields, etc.
-│       │   └── aiService.js     ← chat(), translateDocument(), compareDocuments()
+│       │   ├── aiService.js     ← chat(), translateDocument(), compareDocuments()
+│       │   └── citizenService.js ← createCitizen, getUserCitizens, getCitizenDocuments, refreshCitizenDocumentCount
 │       ├── utils/
 │       │   ├── ApiError.js      ← Custom error class with status code
-│       │   ├── response.js      ← sendSuccess, sendCreated, sendError helpers
+│       │   ├── response.js      ← sendSuccess, sendCreated, sendError, sendPaginated helpers
 │       │   └── email.js         ← Stub (not used — no email verification in this version)
 │       ├── app.js               ← Express app setup (middleware chain + route mounting)
 │       └── server.js            ← HTTP server + graceful shutdown (SIGTERM/SIGINT)
@@ -202,31 +227,33 @@ Docurec.ai/
         ├── components/
         │   ├── common/
         │   │   ├── AppLayout.jsx   ← Sidebar + main content wrapper
-        │   │   ├── Sidebar.jsx     ← Navigation with collapse support
-        │   │   └── MobileNav.jsx   ← Bottom nav for mobile
+        │   │   ├── Sidebar.jsx     ← Navigation with collapse support (incl. Citizens link)
+        │   │   └── MobileNav.jsx   ← Bottom nav for mobile (incl. Citizens link)
         │   ├── features/
         │   │   ├── DocumentCard.jsx    ← Card + DocumentCardSkeleton
-        │   │   └── UploadZone.jsx      ← Drag-drop + progress tracking
+        │   │   └── UploadZone.jsx      ← Drag-drop + progress tracking, optional citizenId
         │   └── ui/
         │       └── skeleton.jsx        ← shadcn/ui-style Skeleton component
         ├── pages/
         │   ├── Home.jsx           ← Landing page (features, stats, how-it-works, CTA)
         │   ├── Login.jsx          ← Email + password, single JWT, Redux setAuth
         │   ├── Register.jsx       ← Name, email, password → immediately logged in
-        │   ├── Dashboard.jsx      ← Analytics charts (Recharts) + recent documents
-        │   ├── Documents.jsx      ← Searchable, filterable document list
-        │   ├── DocumentDetail.jsx ← Extracted fields, PII toggle, field correction, translate
-        │   ├── Upload.jsx         ← Single / Batch mode switcher
-        │   ├── Chat.jsx           ← Multi-session AI chat with document context
-        │   └── Compare.jsx        ← Select two docs → field-level diff
+        │   ├── Dashboard.jsx      ← Analytics charts (Recharts) + recent documents + quick actions
+        │   ├── Documents.jsx      ← Searchable, filterable document list + "My Documents Only" toggle
+        │   ├── DocumentDetail.jsx ← Extracted fields, PII toggle, field correction, translate, live status
+        │   ├── Upload.jsx         ← Single / Batch mode switcher + citizen selector
+        │   ├── Chat.jsx           ← Multi-session AI chat with document context (persists across navigation)
+        │   ├── Compare.jsx        ← Select two docs → field-level diff
+        │   ├── Citizens.jsx       ← Citizen directory: search, add, remove
+        │   └── CitizenDetail.jsx  ← Citizen profile + their document folder + scoped upload
         ├── services/
-        │   └── api.js             ← Axios instance, request interceptor (token), authAPI, documentAPI, chatAPI, userAPI
+        │   └── api.js             ← Axios instance, request interceptor (token), authAPI, documentAPI, chatAPI, userAPI, citizenAPI
         ├── store/
         │   ├── index.js           ← Redux store (auth + ui reducers)
         │   ├── authSlice.js       ← setAuth, updateUser, logout + localStorage persistence
         │   └── uiSlice.js         ← Sidebar collapsed state
         ├── hooks/
-        │   └── useDebounce.js     ← Generic debounce hook (used in document search)
+        │   └── useDebounce.js     ← Generic debounce hook (used in document/citizen search)
         └── utils/
             └── cn.js              ← clsx + tailwind-merge utility
 ```
@@ -246,9 +273,9 @@ Docurec.ai/
 ### Documents — `/api/v1/documents`
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/` | ✅ | List documents (pagination, search, filter by type/status) |
-| POST | `/upload` | ✅ | Upload single document → triggers OCR pipeline |
-| POST | `/batch-upload` | ✅ | Upload up to 50 documents at once |
+| GET | `/` | ✅ | List documents (pagination, search, filter by type/status/citizen, `unassignedOnly`) |
+| POST | `/upload` | ✅ | Upload single document → triggers OCR pipeline. Optional `citizenId` in body |
+| POST | `/batch-upload` | ✅ | Upload up to 50 documents at once. Optional `citizenId` in body |
 | GET | `/analytics` | ✅ | Stats: counts, language distribution, type breakdown |
 | POST | `/compare` | ✅ | Field-level AI diff between two documents |
 | GET | `/:id` | ✅ | Full document with extracted fields and text |
@@ -256,7 +283,17 @@ Docurec.ai/
 | POST | `/:id/mask-pii` | ✅ | Toggle PII masking on/off |
 | PATCH | `/:id/correct` | ✅ | Manually correct a field value (logged) |
 | POST | `/:id/translate` | ✅ | AI translate extracted text to target language |
-| DELETE | `/:id` | ✅ | Soft delete document |
+| DELETE | `/:id` | ✅ | Soft delete document (refreshes citizen doc count if assigned) |
+
+### Citizens — `/api/v1/citizens`
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/` | ✅ | List citizens for the logged-in operator (pagination, search by name/phone/village/district) |
+| POST | `/` | ✅ | Add a new citizen (name required; phone, email, village, district, state, notes optional) |
+| GET | `/:id` | ✅ | Get a single citizen's profile |
+| PATCH | `/:id` | ✅ | Update citizen profile fields |
+| DELETE | `/:id` | ✅ | Soft delete citizen (their documents remain, become unassigned) |
+| GET | `/:id/documents` | ✅ | List all documents in this citizen's folder (pagination, filter by status/type) |
 
 ### Chat — `/api/v1/chat`
 | Method | Endpoint | Auth | Description |
@@ -281,7 +318,8 @@ Docurec.ai/
 | NoSQL injection | `express-mongo-sanitize` on all request bodies |
 | XSS | `xss-clean` middleware |
 | Input validation | `express-validator` on all auth + document routes |
-| Cache invalidation | Redis keys cleared on every write (doc update, delete, PII toggle) |
+| Data isolation | Every citizen and document query is scoped to `userId` — operators can only see their own citizens and documents |
+| Cache invalidation | Redis keys cleared on every write (doc update, delete, PII toggle, citizen create/update/delete) |
 
 ---
 
@@ -375,14 +413,16 @@ Services:
 ## Demo Walkthrough (for judges)
 
 1. **Register** → account created, immediately logged in (no OTP, no email verification)
-2. **Upload** an Aadhaar scan (drag-drop to the Upload page)
-3. Watch status update: `queued → processing → completed`
+2. **Upload** an Aadhaar scan (drag-drop to the Upload page) — optionally select "My Documents" or a citizen from the dropdown
+3. Watch status update live: `queued → processing → completed` (no manual refresh needed)
 4. Open the document → see extracted fields: name, DOB, Aadhaar number, address
 5. Click **"Mask PII"** → Aadhaar and DOB are hidden — safe to share
 6. Click any field → inline edit, correction logged
-7. Go to **Chat** → ask *"What is the date of birth on my Aadhaar?"* in Hindi or English
+7. Go to **Chat** → ask *"What is the date of birth on my Aadhaar?"* in Hindi or English — and ask directly from a document's "Ask AI" button too
 8. Go to **Compare** → pick two documents → see field-level diff
-9. **Dashboard** → see charts: languages detected, document types, processing stats
+9. Go to **Citizens** → add a citizen (e.g. "Suresh Kumar, Rampur village"), open their profile, upload a document directly into their folder
+10. Back on **Documents**, toggle **"My Documents Only"** to see your own files separate from citizens' files
+11. **Dashboard** → see charts: languages detected, document types, processing stats, and a "Manage Citizens" quick action
 
 ---
 
@@ -400,6 +440,7 @@ The frontend uses a custom dark design system defined in `tailwind.config.js` an
 
 ## What Makes This Different
 
+- **Built for real CSC workflows** — one operator account can manage documents for hundreds of citizens, each in their own folder, without losing the ability to keep personal documents separate
 - **No fake demo data** — every feature works end-to-end with real files
 - **Tesseract traineddata bundled** — works offline for OCR, no external service dependency
 - **Never fails silently** — even a completely garbled scan returns partial data with a low confidence score rather than an error
