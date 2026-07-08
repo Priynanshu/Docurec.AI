@@ -143,24 +143,6 @@ export default function Home() {
     },
   ];
 
-  const testimonials = [
-    {
-      name: 'Priya Sharma', role: 'Legal Aid Officer, Delhi',
-      text: 'We process 200+ court notices daily. DocuRec AI cut our manual data entry by 80%. The Hindi support is incredible.',
-      delay: 0,
-    },
-    {
-      name: 'Ravi Patel', role: 'CSC Operator, Gujarat',
-      text: 'Village citizens bring blurry Aadhaar photos and DocuRec extracts everything perfectly. Game changer for rural India.',
-      delay: 0.08,
-    },
-    {
-      name: 'Ananya Krishnan', role: 'Land Records Officer, Tamil Nadu',
-      text: 'Tamil land records that no other OCR could read — DocuRec handles them with 90%+ accuracy.',
-      delay: 0.16,
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-bg-primary overflow-x-hidden">
 
@@ -179,7 +161,6 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-6 text-sm text-text-secondary">
             <a href="#features" className="hover:text-text-primary transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-text-primary transition-colors">How it works</a>
-            <a href="#testimonials" className="hover:text-text-primary transition-colors">Testimonials</a>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -312,7 +293,7 @@ export default function Home() {
               </div>
 
               {}
-              <div className="p-4 space-y-2">
+              <div className="p-4 space-y-1">
                 <p className="text-[10px] font-semibold text-sky mb-3 uppercase tracking-wide">Extracted Fields</p>
                 {[
                   { key: 'Name', val: 'Rajesh Kumar', conf: 97 },
@@ -336,17 +317,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {}
-      <section className="py-16 px-4 border-y border-border">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-8">
-          <Stat value="12+" label="Indian Languages" />
-          <Stat value="500M+" label="Citizens Can Benefit" />
-          <Stat value="95%+" label="Avg OCR Accuracy" />
-          <Stat value="<15s" label="Processing Time" />
-        </div>
-      </section>
-
-      {}
+      
       <section id="features" className="py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-14">
@@ -434,22 +405,6 @@ export default function Home() {
         </div>
       </section>
 
-      {}
-      <section id="testimonials" className="py-20 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          <FadeIn className="text-center mb-14">
-            <span className="badge-sky text-xs mb-3 inline-block">Testimonials</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-              Trusted by those who work<br />with Indian documents every day
-            </h2>
-          </FadeIn>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {testimonials.map((t) => <Testimonial key={t.name} {...t} />)}
-          </div>
-        </div>
-      </section>
-
-      {}
       <section className="py-16 px-4 border-y border-border bg-bg-secondary">
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-10">
@@ -504,9 +459,7 @@ export default function Home() {
               DocuRec<span className="text-sky"> AI</span>
             </span>
           </div>
-          <p className="text-text-tertiary text-xs">
-            Built for Bharat — Digitizing 500M+ Indian citizens' documents
-          </p>
+
           <div className="flex items-center gap-4 text-xs text-text-tertiary">
             <Link to="/auth/login" className="hover:text-sky transition-colors">Sign in</Link>
             <Link to="/auth/register" className="hover:text-sky transition-colors">Register</Link>
